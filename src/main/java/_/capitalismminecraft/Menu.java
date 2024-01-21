@@ -17,9 +17,9 @@ public class Menu {
         ItemStack item = null;
         ItemMeta meta = null;
 
-        item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        item = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         meta = item.getItemMeta();
-        meta.displayName(Component.text(ChatColor.RED + "MENU"));
+        meta.displayName(Component.text(""));
         item.setItemMeta(meta);
         for (int i = 0; i < 27; i++) {
             inventory.setItem(i, item);

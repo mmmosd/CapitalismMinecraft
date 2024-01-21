@@ -34,7 +34,15 @@ public final class CapitalismMinecraft extends JavaPlugin {
                     p.sendActionBar(Component.text(ChatColor.GREEN + "나의 자산: " + money + "$"));
                 }
             }
-        }, 4, 4);
+        }, 20, 20);
+
+        Bukkit.getScheduler().runTaskTimer( this , new Runnable() {
+
+            @Override
+            public void run() {
+                shop.InitPrice();
+            }
+        }, 288000, 288000);
     }
 
     @Override
