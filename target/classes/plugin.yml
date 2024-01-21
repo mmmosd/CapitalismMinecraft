@@ -1,0 +1,4 @@
+name: CapitalismMinecraft
+version: '1.0'
+main: _.capitalismminecraft.CapitalismMinecraft
+api-version: '1.20'

@@ -1,0 +1,4 @@
+name: CapitalismMinecraft
+version: '${project.version}'
+main: _.capitalismminecraft.CapitalismMinecraft
+api-version: '1.20'
