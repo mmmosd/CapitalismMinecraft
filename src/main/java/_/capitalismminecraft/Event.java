@@ -3,7 +3,6 @@ package _.capitalismminecraft;
 import java.util.Random;
 
 import org.bukkit.Material;
-import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,12 +15,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-public class Event implements Listener {
-    public static CapitalismMinecraft plugin;
+import net.kyori.adventure.text.Component;
 
-    public static void setPlugin(CapitalismMinecraft MainPlugin) {
-        plugin = MainPlugin;
-    }
+public class Event implements Listener {
+    CapitalismMinecraft plugin = CapitalismMinecraft.getInstance();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -32,12 +29,37 @@ public class Event implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        Player p = (Player) event.getWhoClicked();
+        Component clicked_item = event.getCurrentItem().getItemMeta().displayName();
         
+        if (clicked_item.equals(plugin.menu.items.get(0).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
+        else if (clicked_item.equals(plugin.menu.items.get(1).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
+        else if (clicked_item.equals(plugin.menu.items.get(2).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
+        else if (clicked_item.equals(plugin.menu.items.get(3).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
+        else if (clicked_item.equals(plugin.menu.items.get(4).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
+        else if (clicked_item.equals(plugin.menu.items.get(5).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
+        else if (clicked_item.equals(plugin.menu.items.get(6).getItemMeta().displayName())) {
+            event.setCancelled(true);
+        }
     }
     
     @EventHandler
     public void onAdvancementDone(PlayerAdvancementDoneEvent event) {
         Player p = event.getPlayer();
+
+        event.message(null);
 
         // event.getAdvancement()
     }

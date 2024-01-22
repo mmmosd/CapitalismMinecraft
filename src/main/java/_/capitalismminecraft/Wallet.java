@@ -1,91 +1,65 @@
 package _.capitalismminecraft;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.UUID;
 
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-
 
 public class Wallet {
-    public HashMap<UUID, Integer> Wlist = new HashMap<UUID, Integer>();
+    CapitalismMinecraft plugin = CapitalismMinecraft.getInstance();
+
+    public HashMap<String, Integer> Wlist = new HashMap<String, Integer>();
 
     public void Save(File f, CapitalismMinecraft plugin) {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
 
             @Override
             public void run() {
-                try {
-                    FileWriter writer = new FileWriter(f, false);
-                    for(UUID uuid : Wlist.keySet()){
-                        writer.write(uuid.toString() + "|" + Wlist.get(uuid) + "\n");
-                    }
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                for (Player p : plugin.getServer().getOnlinePlayers()) {
+                    plugin.getConfig().set(p.getName(), Wlist.get(p.getName()));
                 }
             }
         }, 20 * 30, 20 * 30);
     }
 
-    public void Load(File f) {
-        try {
-            try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
-                String fileLine = null;
-                while ((fileLine = reader.readLine()) != null) {
+    public void Load() {
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
+            String name = p.getName();
+            int money = plugin.getConfig().getInt(name);
 
-                    UUID uuid = UUID.fromString(fileLine.split("\\|")[0]);
-                    String str = fileLine.split("\\|")[1];
-
-                    Wlist.put(uuid, Integer.parseInt(str));
-                }
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e3) {
-            e3.printStackTrace();
-        } catch (IOException e4) {
-            e4.printStackTrace();
+            Wlist.put(name, money);
         }
-    }
 
-    public void makeFile(File f) {
-        if (!f.exists() || !f.isFile()) {
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        for (OfflinePlayer p : plugin.getServer().getOfflinePlayers()) {
+            String name = p.getName();
+            int money = plugin.getConfig().getInt(name);
+
+            Wlist.put(name, money);
         }
     }
 
     public void CreateWallet(Player p) {
-        Wlist.putIfAbsent(p.getUniqueId(), 0);
+        Wlist.putIfAbsent(p.getName(), 0);
     }
 
     public void AddMoney(Player p, int amount) {
-        Wlist.replace(p.getUniqueId(), Wlist.get(p.getUniqueId()) + amount);
+        Wlist.replace(p.getName(), Wlist.get(p.getName()) + amount);
     }
 
     public void SubMoney(Player p, int amount) {
-        Wlist.replace(p.getUniqueId(), Wlist.get(p.getUniqueId()) - amount);
+        Wlist.replace(p.getName(), Wlist.get(p.getName()) - amount);
     }
 
     public void SendMoneyAtoB(Player a, Player b, int amount) {
-        UUID A = a.getUniqueId(), B = b.getUniqueId();
+        String A = a.getName(), B = b.getName();
 
         if (Wlist.containsKey(A) && Wlist.containsKey(B)) {
             if (Wlist.get(A) >= amount) {
