@@ -10,20 +10,11 @@ import net.md_5.bungee.api.ChatColor;
 import java.io.File;
 
 public final class CapitalismMinecraft extends JavaPlugin {
-    private static CapitalismMinecraft instance;
+    public static CapitalismMinecraft instance;
 
     public Wallet wallet = new Wallet();
     public Shop shop = new Shop();
     public Menu menu = new Menu();
-
-    public static CapitalismMinecraft getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new CapitalismMinecraft();
-        }
-        return instance;
-    }
 
     public void InitConfig() {
         saveConfig();
@@ -42,10 +33,10 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 for(Player p : Bukkit.getServer().getOnlinePlayers())
                 {
                     int money = wallet.Wlist.get(p.getName());
-                    p.sendActionBar(Component.text(ChatColor.GREEN + "나의 자산: " + money + "$"));
+                    p.sendActionBar(Component.text(ChatColor.GREEN + "소지금: " + money + "$"));
                 }
             }
-        }, 20, 20);
+        }, 4, 4);
     }
 
     public void updatePrice() {
@@ -63,14 +54,20 @@ public final class CapitalismMinecraft extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Event(), this);
+        instance = this;
 
         InitConfig();
         updatePerSec();
         updatePrice();
+        
+        wallet.Save();
+        wallet.Load();
+
+        menu.init_items();
     }
 
     @Override
     public void onDisable() {
-        
+        wallet.Save();
     }
 }

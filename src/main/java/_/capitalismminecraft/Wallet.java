@@ -8,29 +8,28 @@ import org.bukkit.entity.Player;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
-import java.io.*;
 import java.util.HashMap;
-import java.util.UUID;
 
 
 public class Wallet {
-    CapitalismMinecraft plugin = CapitalismMinecraft.getInstance();
-
     public HashMap<String, Integer> Wlist = new HashMap<String, Integer>();
 
-    public void Save(File f, CapitalismMinecraft plugin) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+    public void Save() {
+        CapitalismMinecraft plugin = CapitalismMinecraft.instance;
 
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     plugin.getConfig().set(p.getName(), Wlist.get(p.getName()));
+                    plugin.saveConfig();
                 }
             }
         }, 20 * 30, 20 * 30);
     }
 
     public void Load() {
+        CapitalismMinecraft plugin = CapitalismMinecraft.instance;
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             String name = p.getName();
             int money = plugin.getConfig().getInt(name);

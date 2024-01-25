@@ -1,15 +1,20 @@
 package _.capitalismminecraft;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import net.kyori.adventure.text.Component;
 
 public class Shop {
-    CapitalismMinecraft plugin = CapitalismMinecraft.getInstance();
-
     HashMap<Material, Integer> Item = new HashMap<Material, Integer>();
+    HashMap<Material, Integer> ExchangeItem = new HashMap<Material, Integer>();
 
     HashMap<Material, Integer> SellData = new HashMap<Material, Integer>();
     HashMap<Material, Integer> BuyData = new HashMap<Material, Integer>();
@@ -27,8 +32,23 @@ public class Shop {
         //먹었을 때 효과가 부여되지 않는 것만 (황금사과류 제외)
     }
 
-    public void OpenPotionShopGUI() {
-        //포션 ("시간 + 레벨"에 따라 가격 책정), 인첸트북 ("인첸트 레벨 + 인첸트 개수" 에 따라 가격 책정)
+    public void OpenExchangeShopGUI(Player p) {
+        // Inventory inventory = Bukkit.createInventory(p.getInventory().getHolder(), 27, Component.text("거래소"));
+
+        // ItemStack item = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+        // ItemMeta meta = item.getItemMeta();
+        // meta.displayName(Component.text(""));
+        // item.setItemMeta(meta);
+        // items.add(item);
+        // for (int i = 0; i < 27; i++) {
+        //     inventory.setItem(i, items.get(0));
+        // }
+
+
+
+        // p.closeInventory();
+        // p.openInventory(inventory);
+        // p.playSound(p.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1, 1);
     }
 
     public void ResetData() {
@@ -53,6 +73,8 @@ public class Shop {
             BuyData.put(category, price);
         }
     }
+
+
 
     public void ResetPrice() {
 
