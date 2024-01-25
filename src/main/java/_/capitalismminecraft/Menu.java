@@ -60,7 +60,7 @@ public class Menu {
         item.setItemMeta(meta);
         items.add(item);
 
-        item = new ItemStack(Material.MOJANG_BANNER_PATTERN);
+        item = new ItemStack(Material.BOOK);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.YELLOW + "퀘스트"));
         item.setItemMeta(meta);
@@ -80,28 +80,17 @@ public class Menu {
             inventory.setItem(i, items.get(0));
         }
 
-        inventory.setItem(0, items.get(1));
-
-        inventory.setItem(1, items.get(2));
-
-        inventory.setItem(2, items.get(3));
-
-        inventory.setItem(7, items.get(4));
-
-<<<<<<< HEAD
-        inventory.setItem(8, items.get(5));
+        inventory.setItem(2, items.get(1));
+        inventory.setItem(4, items.get(2));
+        inventory.setItem(6, items.get(3));
+        inventory.setItem(12, items.get(4));
+        inventory.setItem(14, items.get(5));
+        inventory.setItem(26, items.get(6));
 
         p.closeInventory();
         p.openInventory(inventory);
         p.playSound(p.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1, 1);
     }
-=======
-        inventory.setItem(6, items.get(5));
-
-        inventory.setItem(7, items.get(6));
-
-        inventory.setItem(8, items.get(7));
->>>>>>> 52db54afb536b8c557b9aad3d1208ca7e0fa4026
 
     public void OpenSendMoneyMenu(Player p) {
         Inventory inventory = Bukkit.createInventory(p.getInventory().getHolder(), 27, Component.text("송금하기"));

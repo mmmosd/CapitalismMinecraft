@@ -12,7 +12,18 @@ import java.util.HashMap;
 
 
 public class Wallet {
+    public class SendInfo {
+        Player target;
+        int amount;
+
+        public SendInfo(Player target, int amount) {
+            this.target = target;
+            this.amount = amount;
+        }
+    }
+
     public HashMap<String, Integer> Wlist = new HashMap<String, Integer>();
+    public HashMap<String, SendInfo> Sending = new HashMap<String, SendInfo>();
 
     public void Save() {
         CapitalismMinecraft plugin = CapitalismMinecraft.instance;

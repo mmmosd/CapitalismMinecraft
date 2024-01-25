@@ -1,6 +1,8 @@
 package _.capitalismminecraft;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -8,13 +10,26 @@ import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.File;
+import java.io.IOException;
 
 public final class CapitalismMinecraft extends JavaPlugin {
     public static CapitalismMinecraft instance;
 
+    private final File ESf = new File(getDataFolder(), "/ExchangeItem.txt");
+
     public Wallet wallet = new Wallet();
     public Shop shop = new Shop();
     public Menu menu = new Menu();
+
+    public void makeFile(File f) {
+        if (!f.exists() || !f.isFile()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void InitConfig() {
         saveConfig();
@@ -25,7 +40,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
         }
     }
 
-    public void updatePerSec() {
+    public void update() {
         Bukkit.getScheduler().runTaskTimer( this , new Runnable() {
 
             @Override
@@ -57,13 +72,22 @@ public final class CapitalismMinecraft extends JavaPlugin {
         instance = this;
 
         InitConfig();
-        updatePerSec();
+        update();
         updatePrice();
+
+        makeFile(ESf);
+        shop.SaveES(ESf);
+        shop.LoadES(ESf);
         
         wallet.Save();
         wallet.Load();
 
         menu.init_items();
+
+        for (World w : Bukkit.getServer().getWorlds()) {
+            w.setGameRule(GameRule.KEEP_INVENTORY, true);
+            w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+        }
     }
 
     @Override

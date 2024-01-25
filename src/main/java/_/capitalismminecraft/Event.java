@@ -22,7 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import _.capitalismminecraft.Wallet.SendInfo;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.md_5.bungee.api.ChatColor;
 
 public class Event implements Listener {
@@ -39,55 +42,100 @@ public class Event implements Listener {
         CapitalismMinecraft plugin = CapitalismMinecraft.instance;
         Player p = (Player) event.getWhoClicked();
 
-        if (event.getCurrentItem() != null) {
+        if (event.getCurrentItem() != null && event.getCurrentItem().getItemMeta() != null) {
             Component clicked_item = event.getCurrentItem().getItemMeta().displayName();
+
+            if (clicked_item.equals(plugin.menu.items.get(0).getItemMeta().displayName())) { // 빈 공간
+                event.setCancelled(true);
+                return;
+            }
         
             if (event.getView().title().equals(Component.text("메뉴"))) {
-                if (clicked_item.equals(plugin.menu.items.get(0).getItemMeta().displayName())) { // 빈 공간
+                if (clicked_item.equals(plugin.menu.items.get(1).getItemMeta().displayName())) { // 목재
                     event.setCancelled(true);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.items.get(1).getItemMeta().displayName())) { // 목재
-                    event.setCancelled(true);
+                    plugin.shop.OpenWoodShopGUI();
                     return;
                 }
                 else if (clicked_item.equals(plugin.menu.items.get(2).getItemMeta().displayName())) { // 광물
                     event.setCancelled(true);
+                    plugin.shop.OpenMineralShopGUI();
                     return;
                 }
                 else if (clicked_item.equals(plugin.menu.items.get(3).getItemMeta().displayName())) { // 식료품
                     event.setCancelled(true);
+                    plugin.shop.OpenFoodShopGUI();
                     return;
                 }
                 else if (clicked_item.equals(plugin.menu.items.get(4).getItemMeta().displayName())) { // 거래소
                     event.setCancelled(true);
+                    plugin.shop.OpenExchangeShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.items.get(5).getItemMeta().displayName())) { // 송금
+                else if (clicked_item.equals(plugin.menu.items.get(5).getItemMeta().displayName())) { // 퀘스트
+                    event.setCancelled(true);
+                    return;
+                }
+                else if (clicked_item.equals(plugin.menu.items.get(6).getItemMeta().displayName())) { // 송금
                     event.setCancelled(true);
                     plugin.menu.OpenSendMoneyMenu(p);
                     return;
                 }
             }
 
+            if (event.getView().title().equals(Component.text("거래소"))) {
+
+            }
+
             if (event.getView().title().equals(Component.text("송금하기"))) {
                 for (ItemStack target : event.getInventory().getContents()) { // 송금할 사람
-                    if (clicked_item.equals(target.displayName())) {
-                        event.setCancelled(true);
+                    if (event.getCurrentItem() != null) {
+                        if (clicked_item.equals(target.getItemMeta().displayName())) {
+                            event.setCancelled(true);
 
-                        int amount = 0;
-                        Player targetP = plugin.getServer().getPlayer(target.displayName().toString());
-                        if (targetP == null) continue;
+                            Player targetP = plugin.getServer().getPlayer(target.getItemMeta().getDisplayName());
+                            if (targetP == null) continue;
 
-                        plugin.wallet.SendMoneyAtoB(p, targetP, 0);
-                        return;
+                            p.sendMessage(Component.text(ChatColor.RED + "보낼 금액의 액수를 채팅창에 입력하세요. (숫자만 입력하세요)"));
+
+                            plugin.wallet.Sending.putIfAbsent(p.getName(), plugin.wallet.new SendInfo(targetP, -1));
+                            p.closeInventory();
+                            return;
+                        }
                     }
                 }
             }
         }
-        else if (clicked_item.equals(plugin.menu.items.get(7).getItemMeta().displayName())) {
-            event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onChat(AsyncChatEvent event) {
+        CapitalismMinecraft plugin = CapitalismMinecraft.instance;
+        Player p = event.getPlayer();
+
+        if (plugin.wallet.Sending.containsKey(p.getName())) {
+            if (plugin.wallet.Sending.get(p.getName()).target != null) {
+                String msg = ((TextComponent) event.message()).content();
+                int amount = -1;
+
+                try{
+                    amount = Integer.parseInt(msg);
+                }
+                catch (NumberFormatException ex){
+                    p.sendMessage(Component.text(ChatColor.RED + "숫자만 입력하세요."));
+                    ex.printStackTrace();
+                }
+
+                if (amount != -1) {
+                    event.setCancelled(true);
+                    plugin.wallet.SendMoneyAtoB(p, plugin.wallet.Sending.get(p.getName()).target, amount);
+                    plugin.wallet.Sending.replace(p.getName(), plugin.wallet.new SendInfo(null, -1));
+                }
+            }
         }
+    }
+
+    private static boolean isNumeric(String str){
+        return str != null && str.matches("[0-9.]+");
     }
     
     @EventHandler
