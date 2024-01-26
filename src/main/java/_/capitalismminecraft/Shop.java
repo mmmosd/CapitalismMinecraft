@@ -35,17 +35,22 @@ public class Shop {
         }
     }
 
-    public class ItemInfo {
-        Material mat;
-        int min_price, max_price;
+    public class PriceInfo {
+        int min_price, max_price, now_price;
+
+        public PriceInfo(int min_price, int max_price, int now_price) {
+            this.min_price = min_price;
+            this.max_price = max_price;
+            this.now_price = now_price;
+        }
     }
 
     List<ItemStack> button_items = new ArrayList<ItemStack>();
-    HashMap<Material, Integer> shop_items = new HashMap<Material, Integer>();
+    HashMap<Material, PriceInfo> shop_items = new HashMap<Material, PriceInfo>();
     Stack<ESItem> ExchangeItem = new Stack<ESItem>();
 
-    HashMap<Material, Integer> SellData = new HashMap<Material, Integer>();
-    HashMap<Material, Integer> BuyData = new HashMap<Material, Integer>();
+    List<Material> SellData = new ArrayList<Material>();
+    List<Material> BuyData = new ArrayList<Material>();
 
     public void SaveES(File f) {
         CapitalismMinecraft plugin = CapitalismMinecraft.instance;
@@ -106,7 +111,7 @@ public class Shop {
         List<Component> lores = new ArrayList<>();
 
         // 원목 0~9 (1 골드)
-        shop_items.put(Material.OAK_LOG, 1);
+        shop_items.put(Material.OAK_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.OAK_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -115,7 +120,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.BIRCH_LOG, 1);
+        shop_items.put(Material.BIRCH_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.BIRCH_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -124,7 +129,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.ACACIA_LOG, 1);
+        shop_items.put(Material.ACACIA_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.ACACIA_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -133,7 +138,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.CHERRY_LOG, 1);
+        shop_items.put(Material.CHERRY_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.CHERRY_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -142,7 +147,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.JUNGLE_LOG, 1);
+        shop_items.put(Material.JUNGLE_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.JUNGLE_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -151,7 +156,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.SPRUCE_LOG, 1);
+        shop_items.put(Material.SPRUCE_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.SPRUCE_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -160,7 +165,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.DARK_OAK_LOG, 1);
+        shop_items.put(Material.DARK_OAK_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.DARK_OAK_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -169,7 +174,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.MANGROVE_LOG, 1);
+        shop_items.put(Material.MANGROVE_LOG, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.MANGROVE_LOG);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -178,7 +183,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.WARPED_STEM, 1);
+        shop_items.put(Material.WARPED_STEM, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.WARPED_STEM);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -187,7 +192,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.CRIMSON_STEM, 1);
+        shop_items.put(Material.CRIMSON_STEM, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.CRIMSON_STEM);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -197,7 +202,7 @@ public class Shop {
         button_items.add(item);
 
         //광물 10~20
-        shop_items.put(Material.REDSTONE, 1);
+        shop_items.put(Material.REDSTONE, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.REDSTONE);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -206,7 +211,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.LAPIS_LAZULI, 1);
+        shop_items.put(Material.LAPIS_LAZULI, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.LAPIS_LAZULI);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -215,7 +220,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.COAL, 1);
+        shop_items.put(Material.COAL, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.COAL);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -224,7 +229,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.QUARTZ, 1);
+        shop_items.put(Material.QUARTZ, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.QUARTZ);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -233,7 +238,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.COPPER_INGOT, 2);
+        shop_items.put(Material.COPPER_INGOT, new PriceInfo(1, 4, 2));
         item = new ItemStack(Material.COPPER_INGOT);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -242,7 +247,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.IRON_INGOT, 9);
+        shop_items.put(Material.IRON_INGOT, new PriceInfo(1, 2, 9));
         item = new ItemStack(Material.IRON_INGOT);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -251,7 +256,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.GOLD_INGOT, 9);
+        shop_items.put(Material.GOLD_INGOT, new PriceInfo(1, 2, 1));
         item = new ItemStack(Material.GOLD_INGOT);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -260,7 +265,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.DIAMOND, 55);
+        shop_items.put(Material.DIAMOND, new PriceInfo(1, 2, 55));
         item = new ItemStack(Material.DIAMOND);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -269,7 +274,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.EMERALD, 55);
+        shop_items.put(Material.EMERALD, new PriceInfo(1, 2, 55));
         item = new ItemStack(Material.EMERALD);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -278,7 +283,7 @@ public class Shop {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        shop_items.put(Material.NETHERITE_SCRAP, 110);
+        shop_items.put(Material.NETHERITE_SCRAP, new PriceInfo(1, 2, 110));
         item = new ItemStack(Material.NETHERITE_SCRAP);
         meta = item.getItemMeta();
         lores = new ArrayList<>();
@@ -387,21 +392,11 @@ public class Shop {
     }
 
     public void Sell(Material category, int price) {
-        if (SellData.get(category) != null) {
-            SellData.put(category, SellData.get(category) + price);
-        }
-        else {
-            SellData.put(category, price);
-        }
+        
     }
 
     public void Buy(Material category, int price) {
-        if (BuyData.get(category) != null) {
-            BuyData.put(category, BuyData.get(category) + price);
-        }
-        else {
-            BuyData.put(category, price);
-        }
+        
     }
 
     public void ResetData() {
@@ -410,7 +405,7 @@ public class Shop {
     }
 
     public void ResetPrice() {
-
+        ResetData();
     }
 
     public int Set_items_price(int before_price) {

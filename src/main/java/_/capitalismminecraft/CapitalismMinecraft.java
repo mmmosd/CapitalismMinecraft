@@ -61,7 +61,6 @@ public final class CapitalismMinecraft extends JavaPlugin {
             @Override
             public void run() {
                 shop.ResetPrice();
-                shop.ResetData();
             }
         }, 432000, 432000); //6시간
     }
