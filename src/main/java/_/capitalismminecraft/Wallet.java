@@ -57,7 +57,7 @@ public class Wallet {
     }
 
     public void CreateWallet(Player p) {
-        Wlist.putIfAbsent(p.getName(), 0);
+        Wlist.putIfAbsent(p.getName(), -1000);
     }
 
     public void AddMoney(Player p, int amount) {
@@ -76,8 +76,8 @@ public class Wallet {
                 SubMoney(a, amount);
                 AddMoney(b, amount);
 
-                a.sendMessage(Component.text(ChatColor.LIGHT_PURPLE + b.getName() + ChatColor.WHITE + "님 에게 " + ChatColor.GREEN + amount + "$" + ChatColor.WHITE + "를 보냈습니다!"));
-                b.sendMessage(Component.text(ChatColor.LIGHT_PURPLE + a.getName() + ChatColor.WHITE + "님 에게 " + ChatColor.GREEN + amount + "$" + ChatColor.WHITE + "를 받았습니다!"));
+                a.sendMessage(Component.text(ChatColor.LIGHT_PURPLE + b.getName() + ChatColor.WHITE + "님 에게 " + ChatColor.GREEN + amount + "🪙" + ChatColor.WHITE + "를 보냈습니다!"));
+                b.sendMessage(Component.text(ChatColor.LIGHT_PURPLE + a.getName() + ChatColor.WHITE + "님 에게 " + ChatColor.GREEN + amount + "🪙" + ChatColor.WHITE + "를 받았습니다!"));
 
                 a.playSound(a.getLocation(), Sound.ENTITY_VILLAGER_YES, 1, 1);
                 b.playSound(b.getLocation(), Sound.ENTITY_VILLAGER_YES, 1, 1);

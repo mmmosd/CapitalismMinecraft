@@ -3,6 +3,7 @@ package _.capitalismminecraft;
 import java.util.Random;
 
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
@@ -42,57 +43,79 @@ public class Event implements Listener {
         CapitalismMinecraft plugin = CapitalismMinecraft.instance;
         Player p = (Player) event.getWhoClicked();
 
-        if (event.getCurrentItem() != null && event.getCurrentItem().getItemMeta() != null) {
-            Component clicked_item = event.getCurrentItem().getItemMeta().displayName();
+        if (event.getCurrentItem() != null) {
+            Component clicked_item = event.getCurrentItem().displayName();
 
-            if (clicked_item.equals(plugin.menu.items.get(0).getItemMeta().displayName())) { // 빈 공간
+            if (clicked_item == null) return;
+
+            if (clicked_item.equals(plugin.menu.button_items.get(0).displayName())) { // 빈 공간
                 event.setCancelled(true);
                 return;
             }
         
             if (event.getView().title().equals(Component.text("메뉴"))) {
-                if (clicked_item.equals(plugin.menu.items.get(1).getItemMeta().displayName())) { // 목재
+                if (clicked_item.equals(plugin.menu.button_items.get(1).displayName())) { // 목재
                     event.setCancelled(true);
-                    plugin.shop.OpenWoodShopGUI();
+                    plugin.shop.OpenWoodShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.items.get(2).getItemMeta().displayName())) { // 광물
+                else if (clicked_item.equals(plugin.menu.button_items.get(2).displayName())) { // 광물
                     event.setCancelled(true);
-                    plugin.shop.OpenMineralShopGUI();
+                    plugin.shop.OpenMineralShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.items.get(3).getItemMeta().displayName())) { // 식료품
+                else if (clicked_item.equals(plugin.menu.button_items.get(3).displayName())) { // 식료품
                     event.setCancelled(true);
-                    plugin.shop.OpenFoodShopGUI();
+                    plugin.shop.OpenFoodShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.items.get(4).getItemMeta().displayName())) { // 거래소
+                else if (clicked_item.equals(plugin.menu.button_items.get(4).displayName())) { // 거래소
                     event.setCancelled(true);
                     plugin.shop.OpenExchangeShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.items.get(5).getItemMeta().displayName())) { // 퀘스트
+                else if (clicked_item.equals(plugin.menu.button_items.get(5).displayName())) { // 퀘스트
                     event.setCancelled(true);
+                    plugin.quest.OpenQuestGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.items.get(6).getItemMeta().displayName())) { // 송금
+                else if (clicked_item.equals(plugin.menu.button_items.get(6).displayName())) { // 송금
                     event.setCancelled(true);
                     plugin.menu.OpenSendMoneyMenu(p);
                     return;
                 }
             }
 
+            if (event.getView().title().equals(Component.text("상점"))) {
+            }
+
             if (event.getView().title().equals(Component.text("거래소"))) {
+                if (clicked_item.equals(plugin.menu.button_items.get(7).displayName())) { // 거래소 등록법
+                    event.setCancelled(true);
+                    p.sendMessage(Component.text(ChatColor.GREEN + "등록할 아이템을 손에 들고 '등록 (가격)' 또는 'emndfhr (가격)'이라고 채팅창에 입력하세요. (가격은 숫자로만 입력하세요)"));
+                    p.closeInventory();
+                    return;
+                }
+
+                if (event.getSlot() < plugin.shop.ExchangeItem.size()) {
+                    event.setCancelled(true);
+                    plugin.shop.BuyESItem(p, event.getSlot());
+                    p.closeInventory();
+                    return;
+                }
+            }
+
+            if (event.getView().title().equals(Component.text("퀘스트"))) {
 
             }
 
             if (event.getView().title().equals(Component.text("송금하기"))) {
                 for (ItemStack target : event.getInventory().getContents()) { // 송금할 사람
                     if (event.getCurrentItem() != null) {
-                        if (clicked_item.equals(target.getItemMeta().displayName())) {
+                        if (clicked_item.equals(target.displayName())) {
                             event.setCancelled(true);
 
-                            Player targetP = plugin.getServer().getPlayer(target.getItemMeta().getDisplayName());
+                            Player targetP = plugin.getServer().getPlayer(((TextComponent) target.displayName()).content());
                             if (targetP == null) continue;
 
                             p.sendMessage(Component.text(ChatColor.RED + "보낼 금액의 액수를 채팅창에 입력하세요. (숫자만 입력하세요)"));
@@ -111,10 +134,10 @@ public class Event implements Listener {
     public void onChat(AsyncChatEvent event) {
         CapitalismMinecraft plugin = CapitalismMinecraft.instance;
         Player p = event.getPlayer();
+        String msg = ((TextComponent) event.message()).content();
 
         if (plugin.wallet.Sending.containsKey(p.getName())) {
             if (plugin.wallet.Sending.get(p.getName()).target != null) {
-                String msg = ((TextComponent) event.message()).content();
                 int amount = -1;
 
                 try{
@@ -132,26 +155,36 @@ public class Event implements Listener {
                 }
             }
         }
-    }
 
-    private static boolean isNumeric(String str){
-        return str != null && str.matches("[0-9.]+");
+        String[] split = msg.split(" ");
+        if (split.length == 2) {
+            if (split[0].equals("등록") || split[0].equals("emdfhr")) {
+                event.setCancelled(true);
+
+                int price = -1;
+
+                try{
+                    price = Integer.parseInt(msg);
+                }
+                catch (NumberFormatException ex){
+                    p.sendMessage(Component.text(ChatColor.RED + "가격은 숫자로만 입력하세요."));
+                    ex.printStackTrace();
+                }
+                
+                if (price != -1) {
+                    plugin.shop.AddESItem(p, p.getInventory().getItemInMainHand(), price);
+                    p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+                    p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_YES, 1, 1);
+                }
+            }
+        }
     }
     
     @EventHandler
     public void onAdvancementDone(PlayerAdvancementDoneEvent event) {
         Player p = event.getPlayer();
 
-        event.message(null);
-
         // event.getAdvancement()
-    }
-
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        CapitalismMinecraft plugin = CapitalismMinecraft.instance;
-        Player p = event.getPlayer();
-        plugin.wallet.SubMoney(p, 500);
     }
 
     @EventHandler
@@ -159,8 +192,6 @@ public class Event implements Listener {
         CapitalismMinecraft plugin = CapitalismMinecraft.instance;
         Player p = event.getPlayer();
         ItemStack[] items = p.getInventory().getContents();
-
-        plugin.wallet.SubMoney(p, 500);
 
         p.getInventory().clear();
         p.setLevel(0);
@@ -194,9 +225,18 @@ public class Event implements Listener {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if (event.getEntity().getKiller() != null && event.getEntity().getKiller() instanceof Player && event.getEntity() instanceof Player) {
+        CapitalismMinecraft plugin = CapitalismMinecraft.instance;
+
+        if (event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
-            Player killer = event.getEntity().getKiller();
+            if (event.getEntity().getKiller() != null && event.getEntity().getKiller() instanceof Player) {
+                Player killer = event.getEntity().getKiller();
+
+                plugin.wallet.SubMoney(killer, 500);
+            }
+            else {
+                plugin.wallet.SubMoney(p, 500);
+            }
         }
     }
 

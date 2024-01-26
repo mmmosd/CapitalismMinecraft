@@ -20,6 +20,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
     public Wallet wallet = new Wallet();
     public Shop shop = new Shop();
     public Menu menu = new Menu();
+    public Quest quest = new Quest();
 
     public void makeFile(File f) {
         if (!f.exists() || !f.isFile()) {
@@ -48,7 +49,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 for(Player p : Bukkit.getServer().getOnlinePlayers())
                 {
                     int money = wallet.Wlist.get(p.getName());
-                    p.sendActionBar(Component.text(ChatColor.GREEN + "소지금: " + money + "$"));
+                    p.sendActionBar(Component.text(ChatColor.GOLD + "소지금: " + money + "🪙"));
                 }
             }
         }, 4, 4);
@@ -62,7 +63,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 shop.ResetPrice();
                 shop.ResetData();
             }
-        }, 288000, 288000);
+        }, 432000, 432000); //6시간
     }
     
 
@@ -87,11 +88,12 @@ public final class CapitalismMinecraft extends JavaPlugin {
         for (World w : Bukkit.getServer().getWorlds()) {
             w.setGameRule(GameRule.KEEP_INVENTORY, true);
             w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+            w.setGameRule(GameRule.MOB_GRIEFING, false);
         }
     }
 
     @Override
     public void onDisable() {
-        wallet.Save();
+
     }
 }
