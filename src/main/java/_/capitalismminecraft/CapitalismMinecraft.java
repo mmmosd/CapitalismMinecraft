@@ -16,6 +16,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
     public static CapitalismMinecraft instance;
 
     private final File ESf = new File(getDataFolder(), "/ExchangeItem.txt");
+    private final File Pricef = new File(getDataFolder(), "/Price.txt");
 
     public Wallet wallet = new Wallet();
     public Shop shop = new Shop();
@@ -61,8 +62,12 @@ public final class CapitalismMinecraft extends JavaPlugin {
             @Override
             public void run() {
                 shop.ResetPrice();
+                quest.ResetQuest();
+
+                Bukkit.getServer().sendMessage(Component.text(ChatColor.YELLOW + "상점 가격이 변동되었습니다!"));
+                Bukkit.getServer().sendMessage(Component.text(ChatColor.GREEN + "퀘스트 목록이 변경되었습니다!"));
             }
-        }, 432000, 432000); //6시간
+        }, 1200, 1200); //6시간 = 432000tick
     }
     
 
@@ -75,14 +80,20 @@ public final class CapitalismMinecraft extends JavaPlugin {
         update();
         updatePrice();
 
+        menu.init_items();
+        shop.init_items();
+        quest.ResetQuest();
+
         makeFile(ESf);
         shop.SaveES(ESf);
         shop.LoadES(ESf);
+
+        makeFile(Pricef);
+        shop.SavePrice(Pricef);
+        shop.LoadPrice(Pricef);
         
         wallet.Save();
         wallet.Load();
-
-        menu.init_items();
 
         for (World w : Bukkit.getServer().getWorlds()) {
             w.setGameRule(GameRule.KEEP_INVENTORY, true);

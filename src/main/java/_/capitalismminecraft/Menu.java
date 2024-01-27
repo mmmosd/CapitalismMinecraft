@@ -30,13 +30,21 @@ public class Menu {
         ItemStack item = null;
         ItemMeta meta = null;
 
-        item = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+        // 빈 공간 0
+        item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         meta = item.getItemMeta();
         meta.displayName(Component.text(""));
         item.setItemMeta(meta);
         button_items.add(item);
 
-        //1~6 메인 메뉴
+        //뒤로가기 1
+        item = new ItemStack(Material.WRITABLE_BOOK);
+        meta = item.getItemMeta();
+        meta.displayName(Component.text(ChatColor.LIGHT_PURPLE + "뒤로가기"));
+        item.setItemMeta(meta);
+        button_items.add(item);
+
+        //2~7 메인 메뉴
         item = new ItemStack(Material.OAK_LOG);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.YELLOW + "목재 상점"));
@@ -73,7 +81,7 @@ public class Menu {
         item.setItemMeta(meta);
         button_items.add(item);
 
-        //7 거래소 등록
+        //7 거래소 등록 8
         item = new ItemStack(Material.LIGHTNING_ROD);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.GREEN + "거래소 등록 방법"));
@@ -88,12 +96,12 @@ public class Menu {
             inventory.setItem(i, button_items.get(0));
         }
 
-        inventory.setItem(2, button_items.get(1));
-        inventory.setItem(4, button_items.get(2));
-        inventory.setItem(6, button_items.get(3));
-        inventory.setItem(12, button_items.get(4));
-        inventory.setItem(14, button_items.get(5));
-        inventory.setItem(26, button_items.get(6));
+        inventory.setItem(2, button_items.get(2));
+        inventory.setItem(4, button_items.get(3));
+        inventory.setItem(6, button_items.get(4));
+        inventory.setItem(12, button_items.get(5));
+        inventory.setItem(14, button_items.get(6));
+        inventory.setItem(26, button_items.get(7));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -119,6 +127,8 @@ public class Menu {
             
             inventory.setItem(num++, item);
         }
+
+        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);

@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import _.capitalismminecraft.Quest.Questinfo;
 import _.capitalismminecraft.Wallet.SendInfo;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
@@ -50,50 +52,77 @@ public class Event implements Listener {
             Component clicked_item = event.getCurrentItem().displayName();
 
             if (clicked_item == null) return;
+            if (event.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
 
             if (clicked_item.equals(plugin.menu.button_items.get(0).displayName())) { // 빈 공간
                 event.setCancelled(true);
                 return;
             }
+
+            if (clicked_item.equals(plugin.menu.button_items.get(1).displayName())) { // 빈 공간
+                event.setCancelled(true);
+                plugin.menu.OpenPlayerMenu(p);
+                return;
+            }
         
             if (event.getView().title().equals(Component.text("메뉴"))) {
-                if (clicked_item.equals(plugin.menu.button_items.get(1).displayName())) { // 목재
+                if (clicked_item.equals(plugin.menu.button_items.get(2).displayName())) { // 목재
                     event.setCancelled(true);
                     plugin.shop.OpenWoodShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.button_items.get(2).displayName())) { // 광물
+                else if (clicked_item.equals(plugin.menu.button_items.get(3).displayName())) { // 광물
                     event.setCancelled(true);
                     plugin.shop.OpenMineralShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.button_items.get(3).displayName())) { // 식료품
+                else if (clicked_item.equals(plugin.menu.button_items.get(4).displayName())) { // 식료품
                     event.setCancelled(true);
                     plugin.shop.OpenFoodShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.button_items.get(4).displayName())) { // 거래소
+                else if (clicked_item.equals(plugin.menu.button_items.get(5).displayName())) { // 거래소
                     event.setCancelled(true);
                     plugin.shop.OpenExchangeShopGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.button_items.get(5).displayName())) { // 퀘스트
+                else if (clicked_item.equals(plugin.menu.button_items.get(6).displayName())) { // 퀘스트
                     event.setCancelled(true);
                     plugin.quest.OpenQuestGUI(p);
                     return;
                 }
-                else if (clicked_item.equals(plugin.menu.button_items.get(6).displayName())) { // 송금
+                else if (clicked_item.equals(plugin.menu.button_items.get(7).displayName())) { // 송금
                     event.setCancelled(true);
                     plugin.menu.OpenSendMoneyMenu(p);
                     return;
                 }
             }
 
-            if (event.getView().title().equals(Component.text("상점"))) {
+            if (event.getView().title().equals(Component.text("나무 상점")) 
+            || event.getView().title().equals(Component.text("광물 상점")) 
+            || event.getView().title().equals(Component.text("음식 상점"))) {
+                for (ItemStack stack : plugin.shop.button_items) {
+                    if (event.getCurrentItem().getType().equals(stack.getType())) { // 구매, 판매
+                        event.setCancelled(true);
+                        if (event.isRightClick()) {
+                            plugin.shop.Sell(p, stack.getType(), !event.isShiftClick());
+                        }
+                        else if (event.isLeftClick()) {
+                            if (10 <= plugin.shop.button_items.indexOf(stack) && plugin.shop.button_items.indexOf(stack) <= 19) {
+                                p.sendMessage(Component.text(ChatColor.RED + "구매할 수 없는 항목입니다."));
+                                p.playSound(p.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1, 1);
+                                continue;
+                            }
+
+                            plugin.shop.Buy(p, stack.getType(), !event.isShiftClick());
+                        }
+                        return;
+                    }
+                }
             }
 
             if (event.getView().title().equals(Component.text("거래소"))) {
-                if (clicked_item.equals(plugin.menu.button_items.get(7).displayName())) { // 거래소 등록법
+                if (clicked_item.equals(plugin.menu.button_items.get(8).displayName())) { // 거래소 등록법
                     event.setCancelled(true);
                     p.sendMessage(Component.text(ChatColor.GREEN + "등록할 아이템을 손에 들고 '등록 (가격)' 또는 'emndfhr (가격)'이라고 채팅창에 입력하세요. (가격은 숫자로만 입력하세요)"));
                     p.closeInventory();
@@ -103,30 +132,32 @@ public class Event implements Listener {
                 if (event.getSlot() < plugin.shop.ExchangeItem.size()) {
                     event.setCancelled(true);
                     plugin.shop.BuyESItem(p, event.getSlot());
-                    p.closeInventory();
                     return;
                 }
             }
 
             if (event.getView().title().equals(Component.text("퀘스트"))) {
-
+                for (Questinfo q : plugin.quest.quests) {
+                    if (event.getCurrentItem().getType().equals(q.item.getType())) { // 퀘스트 완료
+                        event.setCancelled(true);
+                        plugin.quest.complet_quest(p, event.getCurrentItem().getType());
+                    }
+                }
             }
 
             if (event.getView().title().equals(Component.text("송금하기"))) {
                 for (ItemStack target : event.getInventory().getContents()) { // 송금할 사람
-                    if (event.getCurrentItem() != null) {
-                        if (clicked_item.equals(target.displayName())) {
-                            event.setCancelled(true);
+                    if (target != null && clicked_item.equals(target.displayName())) {
+                        event.setCancelled(true);
 
-                            Player targetP = plugin.getServer().getPlayer(((TextComponent) target.displayName()).content());
-                            if (targetP == null) continue;
+                        Player targetP = plugin.getServer().getPlayer(((TextComponent) target.displayName()).content());
+                        if (targetP == null) continue;
 
-                            p.sendMessage(Component.text(ChatColor.RED + "보낼 금액의 액수를 채팅창에 입력하세요. (숫자만 입력하세요)"));
+                        p.sendMessage(Component.text(ChatColor.RED + "보낼 금액의 액수를 채팅창에 입력하세요. (숫자만 입력하세요)"));
 
-                            plugin.wallet.Sending.putIfAbsent(p.getName(), plugin.wallet.new SendInfo(targetP, -1));
-                            p.closeInventory();
-                            return;
-                        }
+                        plugin.wallet.Sending.putIfAbsent(p.getName(), plugin.wallet.new SendInfo(targetP, -1));
+                        p.closeInventory();
+                        return;
                     }
                 }
             }
@@ -167,7 +198,7 @@ public class Event implements Listener {
                 int price = -1;
 
                 try{
-                    price = Integer.parseInt(msg);
+                    price = Integer.parseInt(split[1]);
                 }
                 catch (NumberFormatException ex){
                     p.sendMessage(Component.text(ChatColor.RED + "가격은 숫자로만 입력하세요."));
@@ -244,10 +275,12 @@ public class Event implements Listener {
             if (event.getEntity().getKiller() != null && event.getEntity().getKiller() instanceof Player) {
                 Player killer = event.getEntity().getKiller();
 
-                plugin.wallet.SubMoney(killer, 500);
+                plugin.wallet.SubMoney(killer, 1000);
+                plugin.getServer().sendMessage(Component.text(ChatColor.RED + "[벌금형] " + killer.getName() + "님 에게 " + ChatColor.GOLD + "-1000🪙" + ChatColor.RED + "의 벌금이 주어집니다."));
             }
             else {
-                plugin.wallet.SubMoney(p, 500);
+                plugin.wallet.SubMoney(p, 100);
+                p.sendMessage(Component.text(ChatColor.RED + "자연사는 " + ChatColor.GOLD + "-100🪙" + ChatColor.RED + "의 패널티가 주어집니다."));
             }
         }
     }
