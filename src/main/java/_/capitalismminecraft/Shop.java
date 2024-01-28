@@ -234,7 +234,7 @@ public class Shop {
         item = new ItemStack(Material.EMERALD);
         button_items.add(item);
 
-        shop_items.put(Material.NETHERITE_SCRAP, new PriceInfo(100, 120, 110, 0, 0));
+        shop_items.put(Material.NETHERITE_SCRAP, new PriceInfo(100, 300, 200, 0, 0));
         item = new ItemStack(Material.NETHERITE_SCRAP);
         button_items.add(item);
 
@@ -251,7 +251,7 @@ public class Shop {
         item = new ItemStack(Material.GOLDEN_APPLE);
         button_items.add(item);
 
-        shop_items.put(Material.ENCHANTED_GOLDEN_APPLE, new PriceInfo(200, 400, 300, 0, 0));
+        shop_items.put(Material.ENCHANTED_GOLDEN_APPLE, new PriceInfo(100, 300, 200, 0, 0));
         item = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE);
         button_items.add(item);
 
@@ -560,15 +560,11 @@ public class Shop {
         PriceInfo info = shop_items.get(material);
         int result_price = info.now_price;
 
-        if (info.before_count == 0 && info.now_count == 0) { // 너무 안파는 경우 최대가격으로
-            result_price = info.max_price;
-        }
-
         if (info.before_count > 0) { // 이전 데이터가 있어야 가격 변화
             result_price = (int) ((info.now_price * info.now_count)/info.before_count);
         }
-        else {
-            
+        else { // 이전 데이터가 없을 때는 랜덤으로
+            result_price = (int)(Math.random()*info.max_price);
         }
 
         if (result_price <= info.min_price) result_price = info.min_price;
