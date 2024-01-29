@@ -108,7 +108,9 @@ public class Event implements Listener {
                             plugin.shop.Sell(p, stack.getType(), !event.isShiftClick());
                         }
                         else if (event.isLeftClick()) {
-                            if (10 <= plugin.shop.button_items.indexOf(stack) && plugin.shop.button_items.indexOf(stack) <= 19) {
+                            if ((10 <= plugin.shop.button_items.indexOf(stack) && plugin.shop.button_items.indexOf(stack) <= 19)
+                            || (plugin.shop.button_items.indexOf(stack) == 22)
+                            || (plugin.shop.button_items.indexOf(stack) == 23)) {
                                 p.sendMessage(Component.text(ChatColor.RED + "구매할 수 없는 항목입니다."));
                                 p.playSound(p.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1, 1);
                                 continue;

@@ -389,12 +389,21 @@ public class Shop {
             ItemStack item = button_items.get(i);
             PriceInfo info = shop_items.get(item.getType());
 
-            List<Component> lores = new ArrayList<>();
-            lores.add(Component.text(ChatColor.BLUE + "판매" + ChatColor.GOLD + " 가격 : " + info.now_price + "🪙"));
-            lores.add(Component.text(ChatColor.GRAY + "[우클릭] 아이템 1개 판매, [쉬프트키 + 우클릭] 아이템 64개 판매"));
-            lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + info.getBuyPrice() + "🪙"));
-            lores.add(Component.text(ChatColor.GRAY + "[좌클릭] 아이템 1개 구매, [쉬프트키 + 좌클릭] 아이템 64개 구매"));
-            item.lore(lores);
+            if (i == 22 || i == 23) {
+                List<Component> lores = new ArrayList<>();
+                lores.add(Component.text(ChatColor.BLUE + "판매" + ChatColor.GOLD + " 가격 : " + info.now_price + "🪙"));
+                lores.add(Component.text(ChatColor.GRAY + "[우클릭] 아이템 1개 판매, [쉬프트키 + 우클릭] 아이템 64개 판매"));
+                lores.add(Component.text(ChatColor.RED + "구매가 불가능한 상품입니다."));
+                item.lore(lores);
+            }
+            else {
+                List<Component> lores = new ArrayList<>();
+                lores.add(Component.text(ChatColor.BLUE + "판매" + ChatColor.GOLD + " 가격 : " + info.now_price + "🪙"));
+                lores.add(Component.text(ChatColor.GRAY + "[우클릭] 아이템 1개 판매, [쉬프트키 + 우클릭] 아이템 64개 판매"));
+                lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + info.getBuyPrice() + "🪙"));
+                lores.add(Component.text(ChatColor.GRAY + "[좌클릭] 아이템 1개 구매, [쉬프트키 + 좌클릭] 아이템 64개 구매"));
+                item.lore(lores);
+            }
             
             inventory.setItem(num++, item);
         }
