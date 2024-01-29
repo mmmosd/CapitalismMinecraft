@@ -99,6 +99,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
             w.setGameRule(GameRule.KEEP_INVENTORY, true);
             w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
             w.setGameRule(GameRule.MOB_GRIEFING, false);
+            w.setSpawnLocation(0, 0, 0);
         }
     }
 
