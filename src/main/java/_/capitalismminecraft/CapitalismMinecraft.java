@@ -1,9 +1,15 @@
 package _.capitalismminecraft;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.World;
+import _.capitalismminecraft.Skill.CoolDown;
+import _.capitalismminecraft.Commands.bp;
+import _.capitalismminecraft.Commands.bpTab;
+import _.capitalismminecraft.Data.CreateData;
+import org.bukkit.*;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.kyori.adventure.text.Component;
@@ -11,6 +17,8 @@ import net.md_5.bungee.api.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public final class CapitalismMinecraft extends JavaPlugin {
     public static CapitalismMinecraft instance;
@@ -22,6 +30,45 @@ public final class CapitalismMinecraft extends JavaPlugin {
     public Shop shop = new Shop();
     public Menu menu = new Menu();
     public Quest quest = new Quest();
+    public Skill skill = new Skill();
+
+    public static NamespacedKey skillkey;
+
+    CommandSender consol = Bukkit.getConsoleSender();
+
+    public static CreateData createData;
+    public static String bb = ColorChat("&b&lBuild&7&lProtector&8:: &r");
+    public static HashMap<Player, String> optiongui;
+    public static HashMap<Player, String> addgui;
+    public static HashMap<Player, ArmorStand> armorstandData;
+    public static HashMap<Player, Location> Pos1;
+    public static HashMap<Player, Location> Pos2;
+    public static NamespacedKey key;
+
+    public static String ColorChat(String msg) {
+        return org.bukkit.ChatColor.translateAlternateColorCodes('&', msg);
+    }
+
+    public static Plugin getPlugins() {
+        return instance;
+    }
+
+    public static boolean isNumberExeption(String number) {
+        try {
+            Integer var1 = Integer.parseInt(number);
+            return false;
+        } catch (NumberFormatException var2) {
+            return true;
+        }
+    }
+
+    public static boolean isFullInventory(Player p) {
+        return p.getInventory().firstEmpty() == -1;
+    }
+
+    public static NamespacedKey getKey() {
+        return key;
+    }
 
     public void makeFile(File f) {
         if (!f.exists() || !f.isFile()) {
@@ -51,9 +98,17 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 {
                     int money = wallet.Wlist.get(p.getName());
                     p.sendActionBar(Component.text(ChatColor.GOLD + "소지금: " + money + "🪙"));
+
+                    for (ItemStack stack : p.getInventory().getContents()) {
+                        if (stack == null) continue;
+
+                        if (p.getCooldown(stack.getType()) > 0) {
+                            skill.cooldown.get(p.getUniqueId()).add(skill.new CoolDown(stack.getType(), p.getCooldown(stack.getType())));
+                        }
+                    }
                 }
             }
-        }, 4, 4);
+        }, 1, 1);
     }
 
     public void updatePrice() {
@@ -67,7 +122,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 Bukkit.getServer().sendMessage(Component.text(ChatColor.YELLOW + "상점 가격이 변동되었습니다!"));
                 Bukkit.getServer().sendMessage(Component.text(ChatColor.GREEN + "퀘스트 목록이 변경되었습니다!"));
             }
-        }, 1200, 1200); //6시간 = 432000tick
+        }, 432000, 432000); //6시간 = 432000tick
     }
     
 
@@ -75,6 +130,20 @@ public final class CapitalismMinecraft extends JavaPlugin {
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Event(), this);
         instance = this;
+
+        this.consol.sendMessage(ColorChat("&2Build&7Protector:: &f플러그인이 활성화되었습니다."));
+        createData = new CreateData();
+        createData.CreateNewDataFile();
+        createData.CreatePlayerDataFile();
+        optiongui = new HashMap<>();
+        addgui = new HashMap<>();
+        armorstandData = new HashMap<>();
+        Pos1 = new HashMap<>();
+        Pos2 = new HashMap<>();
+        key = new NamespacedKey(this, "CapitalismMinecraft");
+        skillkey = new NamespacedKey(this, "Skill");
+        this.getCommand("bp").setExecutor(new bp(this));
+        this.getCommand("bp").setTabCompleter(new bpTab(this));
 
         InitConfig();
         update();
@@ -91,7 +160,10 @@ public final class CapitalismMinecraft extends JavaPlugin {
         makeFile(Pricef);
         shop.SavePrice(Pricef);
         shop.LoadPrice(Pricef);
-        
+
+        skill.SaveLevel();
+        skill.LoadLevel();
+
         wallet.Save();
         wallet.Load();
 
@@ -105,6 +177,23 @@ public final class CapitalismMinecraft extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        this.consol.sendMessage(ColorChat("&2Build&7Protector:: &f플러그인이 비활성화되었습니다."));
+        instance = null;
+        Iterator var1 = optiongui.keySet().iterator();
 
+        Player p;
+        while(var1.hasNext()) {
+            p = (Player)var1.next();
+            optiongui.remove(p);
+            p.closeInventory();
+        }
+
+        var1 = addgui.keySet().iterator();
+
+        while(var1.hasNext()) {
+            p = (Player)var1.next();
+            addgui.remove(p);
+            p.closeInventory();
+        }
     }
 }

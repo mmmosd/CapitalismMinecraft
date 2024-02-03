@@ -70,14 +70,30 @@ public class Quest {
         }
         if (info == null) return;
 
+        List<ItemStack> items = new ArrayList<ItemStack>();
+
         for (ItemStack stack : p.getInventory().getContents()) {
-            if (stack != null && stack.getType() != null && stack.getType().equals(category)) player_item_count += stack.getAmount();
+            if (stack != null && stack.getType().equals(category)) {
+                player_item_count += stack.getAmount();
+
+                for (int i = 0; i < stack.getAmount(); i++) {
+                    ItemStack s = stack.clone();
+                    s.setAmount(1);
+                    items.add(s);
+                }
+            }
         }
      
         if (player_item_count >= info.count) {
             CapitalismMinecraft.instance.wallet.AddMoney(p, info.money);
             completList.add(p.getUniqueId());
-            p.getInventory().removeItem(new ItemStack(category, info.count));
+            int num = 0;
+            for (ItemStack stack : items) {
+                if (num >= player_item_count) break;
+
+                p.getInventory().removeItem(stack);
+                num++;
+            }
             p.sendMessage(Component.text(ChatColor.GREEN + "퀘스트를 완료했습니다!" + ChatColor.GOLD + " +" + info.money + "🪙"));
             p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
             p.closeInventory();
@@ -98,8 +114,8 @@ public class Quest {
         completList.clear();
 
         count = (int)(Math.random()*32);
-        money = (int)(Math.random()*450 + 50);
-        item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*34)).getType());
+        money = (int)(Math.random()*90 + 10);
+        item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*36)).getType());
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.GREEN + "임무 : 이 아이템 " + count + "개 주기"));
         lores.add(Component.text(ChatColor.GOLD + "보상 : " + money + "🪙"));
@@ -108,8 +124,8 @@ public class Quest {
         quests.add(new Questinfo(item, count, money));
 
         count = (int)(Math.random()*32);
-        money = (int)(Math.random()*450 + 50);
-        item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*34)).getType());
+        money = (int)(Math.random()*90 + 10);
+        item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*36)).getType());
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.GREEN + "임무 : 이 아이템 " + count + "개 주기"));
         lores.add(Component.text(ChatColor.GOLD + "보상 : " + money + "🪙"));
@@ -118,8 +134,8 @@ public class Quest {
         quests.add(new Questinfo(item, count, money));
 
         count = (int)(Math.random()*32);
-        money = (int)(Math.random()*450 + 50);
-        item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*34)).getType());
+        money = (int)(Math.random()*90 + 10);
+        item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*36)).getType());
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.GREEN + "임무 : 이 아이템 " + count + "개 주기"));
         lores.add(Component.text(ChatColor.GOLD + "보상 : " + money + "🪙"));

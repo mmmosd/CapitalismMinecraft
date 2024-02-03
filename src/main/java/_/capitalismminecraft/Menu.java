@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -16,7 +17,7 @@ import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 public class Menu {
-    List<ItemStack> button_items = new ArrayList<ItemStack>();
+    public List<ItemStack> button_items = new ArrayList<ItemStack>();
 
     void init_items() {
         // 0. 클릭 금지 구역
@@ -35,6 +36,7 @@ public class Menu {
         meta = item.getItemMeta();
         meta.displayName(Component.text(""));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
         //뒤로가기 1
@@ -42,50 +44,72 @@ public class Menu {
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.LIGHT_PURPLE + "뒤로가기"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
-        //2~7 메인 메뉴
+        //2~9 메인 메뉴
         item = new ItemStack(Material.OAK_LOG);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.YELLOW + "목재 상점"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
         item = new ItemStack(Material.DIAMOND);
         meta = item.getItemMeta();
-        meta.displayName(Component.text(ChatColor.AQUA + "광물 상점"));
+        meta.displayName(Component.text(ChatColor.DARK_AQUA + "광물 상점"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
         item = new ItemStack(Material.WHEAT);
         meta = item.getItemMeta();
-        meta.displayName(Component.text(ChatColor.GOLD + "농산물&수산물 상점"));
+        meta.displayName(Component.text(ChatColor.GOLD + "농수산물 상점"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+        button_items.add(item);
+
+        item = new ItemStack(Material.END_CRYSTAL);
+        meta = item.getItemMeta();
+        meta.displayName(Component.text(ChatColor.LIGHT_PURPLE + "컨텐츠 상점"));
+        item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
         item = new ItemStack(Material.MOJANG_BANNER_PATTERN);
         meta = item.getItemMeta();
-        meta.displayName(Component.text(ChatColor.GREEN + "거래소"));
+        meta.displayName(Component.text(ChatColor.GOLD + "거래소"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
         item = new ItemStack(Material.BOOK);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.YELLOW + "퀘스트"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+        button_items.add(item);
+
+        item = new ItemStack(Material.ENCHANTING_TABLE);
+        meta = item.getItemMeta();
+        meta.displayName(Component.text(ChatColor.AQUA + "강화"));
+        item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
         item = new ItemStack(Material.LIGHTNING_ROD);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.GREEN + "송금하기"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
 
-        //7 거래소 등록 8
+        // 거래소 등록 10
         item = new ItemStack(Material.LIGHTNING_ROD);
         meta = item.getItemMeta();
         meta.displayName(Component.text(ChatColor.GREEN + "거래소 등록 방법"));
         item.setItemMeta(meta);
+        item.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         button_items.add(item);
     }
 
@@ -96,12 +120,14 @@ public class Menu {
             inventory.setItem(i, button_items.get(0));
         }
 
-        inventory.setItem(2, button_items.get(2));
-        inventory.setItem(4, button_items.get(3));
-        inventory.setItem(6, button_items.get(4));
-        inventory.setItem(12, button_items.get(5));
-        inventory.setItem(14, button_items.get(6));
-        inventory.setItem(26, button_items.get(7));
+        inventory.setItem(1, button_items.get(2));
+        inventory.setItem(3, button_items.get(3));
+        inventory.setItem(5, button_items.get(4));
+        inventory.setItem(7, button_items.get(5));
+        inventory.setItem(11, button_items.get(6));
+        inventory.setItem(13, button_items.get(7));
+        inventory.setItem(15, button_items.get(8));
+        inventory.setItem(26, button_items.get(9));
 
         p.closeInventory();
         p.openInventory(inventory);
