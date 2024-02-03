@@ -97,10 +97,6 @@ public class Skill {
         else {
             int level = check_level(upgrade_stack);
 
-            if (level == -1) {
-                lores.add(Component.text(ChatColor.RED + "error"));
-            }
-
             if (level == 4) {
                 lores.add(Component.text(ChatColor.RED + "이 아이템은 더 이상 강화할 수 없습니다."));
             }

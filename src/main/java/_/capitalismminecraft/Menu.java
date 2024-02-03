@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.persistence.PersistentDataType;
 
 public class Menu {
     public List<ItemStack> button_items = new ArrayList<ItemStack>();
@@ -142,14 +144,22 @@ public class Menu {
         }
 
         int num = 0;
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+        NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "Name");
         for (Player online_p : CapitalismMinecraft.instance.getServer().getOnlinePlayers()) {
             if (online_p.getUniqueId().equals(p.getUniqueId())) continue;
+
+            ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
 
             skullMeta.setOwningPlayer(online_p);
             skullMeta.displayName(Component.text(online_p.getName()));
             item.setItemMeta(skullMeta);
+
+            if (!item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.STRING)) { // 아이템에 코드가 없을 때
+                ItemMeta im = item.getItemMeta();
+                im.getPersistentDataContainer().set(key, PersistentDataType.STRING, online_p.getName());
+                item.setItemMeta(im);
+            }
             
             inventory.setItem(num++, item);
         }

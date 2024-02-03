@@ -60,6 +60,8 @@ public class Shop {
 
     List<ItemStack> button_items = new ArrayList<ItemStack>();
     HashMap<Material, PriceInfo> shop_items = new HashMap<Material, PriceInfo>();
+
+    ContentsStack contentsStack = new ContentsStack();
     HashMap<Material, Integer> ContentItem = new HashMap<Material, Integer>();
     Stack<ESItem> ExchangeItem = new Stack<ESItem>();
 
@@ -243,7 +245,7 @@ public class Shop {
         item = new ItemStack(Material.NETHERITE_SCRAP);
         button_items.add(item);
 
-        //음식 20~35
+        //음식 20~36
         shop_items.put(Material.BREAD, new PriceInfo(1, 4, 2, 0, 0));
         item = new ItemStack(Material.BREAD);
         button_items.add(item);
@@ -274,6 +276,10 @@ public class Shop {
 
         shop_items.put(Material.GOLDEN_CARROT, new PriceInfo(20, 40, 30, 0, 0));
         item = new ItemStack(Material.GOLDEN_CARROT);
+        button_items.add(item);
+
+        shop_items.put(Material.SUGAR_CANE, new PriceInfo(1, 4, 2, 0, 0));
+        item = new ItemStack(Material.SUGAR_CANE);
         button_items.add(item);
 
         shop_items.put(Material.COOKED_BEEF, new PriceInfo(2, 6, 4, 0, 0));
@@ -309,6 +315,7 @@ public class Shop {
         button_items.add(item);
 
         ContentItem.put(CustomStack.RegionProtecter(1).getType(), 5000);
+        ContentItem.put(contentsStack.TpPaper().getType(), 2500);
     }
 
     public void update_inventory() {
@@ -400,7 +407,7 @@ public class Shop {
         }
 
         int num = 0;
-        for (int i = 20; i <= 35; i++) {
+        for (int i = 20; i <= 36; i++) {
             ItemStack item = button_items.get(i);
             PriceInfo info = shop_items.get(item.getType());
 
@@ -447,6 +454,14 @@ public class Shop {
         item.lore(lores);
         inventory.setItem(num++, item);
 
+        item = contentsStack.TpPaper();
+        lores = new ArrayList<>();
+        lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + ContentItem.get(item.getType()) + "🪙"));
+        lores.add(Component.text(ChatColor.GRAY + "[좌클릭] 아이템 1개 구매"));
+        lores.add(Component.text(ChatColor.RED + "판매가 불가능한 상품입니다."));
+        item.lore(lores);
+        inventory.setItem(num++, item);
+
         inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
@@ -483,8 +498,8 @@ public class Shop {
 
         if (stack.lore() != null) lores = stack.lore();
 
-        lores.add(Component.text(ChatColor.GOLD + "가격 : " + price + "🪙"));
-        lores.add(Component.text("판매자 : " + ChatColor.LIGHT_PURPLE + p.getName()));
+        lores.add(0, Component.text(ChatColor.GRAY + "[판매자] " + ChatColor.LIGHT_PURPLE + p.getName()));
+        lores.add(0, Component.text(ChatColor.GOLD + "가격 : " + price + "🪙"));
         stack.lore(lores);
 
         ExchangeItem.push(new ESItem(stack, price, p.getName()));
@@ -503,14 +518,14 @@ public class Shop {
             ItemStack stack = item.item.clone();
             List<Component> lores = stack.lore();
             assert lores != null;
-            lores.remove(Component.text(ChatColor.GOLD + "가격 : " + item.price + "🪙"));
-            lores.remove(Component.text("판매자 : " + ChatColor.LIGHT_PURPLE + seller.getName()));
+            lores.remove(0);
+            lores.remove(0);
             stack.lore(lores);
 
             if (check_can_addItem(p, stack)) {
                 p.getInventory().addItem(stack);
-                p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 취소하였습니다."));
-                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                p.sendMessage(Component.text(ChatColor.RED + "아이템 등록을 취소하였습니다."));
+                p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
 
                 CapitalismMinecraft.instance.getConfig().set("ES|" + num, null);
                 ExchangeItem.remove(num);
@@ -528,8 +543,8 @@ public class Shop {
             ItemStack stack = item.item.clone();
             List<Component> lores = stack.lore();
             assert lores != null;
-            lores.remove(Component.text(ChatColor.GOLD + "가격 : " + item.price + "🪙"));
-            lores.remove(Component.text("판매자 : " + ChatColor.LIGHT_PURPLE + seller.getName()));
+            lores.remove(lores.size()-1);
+            lores.remove(lores.size()-1);
             stack.lore(lores);
 
             if (check_can_addItem(p, stack)) {
@@ -719,7 +734,7 @@ public class Shop {
                 return true;
             }
 
-            if (item.getType().equals(stack.getType())) {
+            if (item.isSimilar(stack)) {
                 if (item.getAmount() + item_count <= item.getMaxStackSize()) {
                     return true;
                 }

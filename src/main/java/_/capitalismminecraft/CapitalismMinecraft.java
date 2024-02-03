@@ -154,18 +154,18 @@ public final class CapitalismMinecraft extends JavaPlugin {
         quest.ResetQuest();
 
         makeFile(ESf);
-        shop.SaveES(ESf);
         shop.LoadES(ESf);
+        shop.SaveES(ESf);
 
         makeFile(Pricef);
-        shop.SavePrice(Pricef);
         shop.LoadPrice(Pricef);
+        shop.SavePrice(Pricef);
 
-        skill.SaveLevel();
         skill.LoadLevel();
+        skill.SaveLevel();
 
-        wallet.Save();
         wallet.Load();
+        wallet.Save();
 
         for (World w : Bukkit.getServer().getWorlds()) {
             w.setGameRule(GameRule.KEEP_INVENTORY, true);

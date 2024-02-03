@@ -114,7 +114,7 @@ public class Quest {
         completList.clear();
 
         count = (int)(Math.random()*32);
-        money = (int)(Math.random()*90 + 10);
+        money = (int)(Math.random()*190 + 10);
         item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*36)).getType());
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.GREEN + "임무 : 이 아이템 " + count + "개 주기"));
@@ -124,7 +124,7 @@ public class Quest {
         quests.add(new Questinfo(item, count, money));
 
         count = (int)(Math.random()*32);
-        money = (int)(Math.random()*90 + 10);
+        money = (int)(Math.random()*190 + 10);
         item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*36)).getType());
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.GREEN + "임무 : 이 아이템 " + count + "개 주기"));
@@ -134,7 +134,7 @@ public class Quest {
         quests.add(new Questinfo(item, count, money));
 
         count = (int)(Math.random()*32);
-        money = (int)(Math.random()*90 + 10);
+        money = (int)(Math.random()*190 + 10);
         item = new ItemStack(plugin.shop.button_items.get((int)(Math.random()*36)).getType());
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.GREEN + "임무 : 이 아이템 " + count + "개 주기"));

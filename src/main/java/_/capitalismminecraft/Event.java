@@ -1,9 +1,6 @@
 package _.capitalismminecraft;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 import _.capitalismminecraft.Build.CreateArea;
 import _.capitalismminecraft.Data.CreateData;
@@ -13,10 +10,7 @@ import _.capitalismminecraft.Items.CustomStack;
 import _.capitalismminecraft.Utils.CheckRegion;
 import _.capitalismminecraft.Utils.CreateRegion;
 import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -185,6 +179,55 @@ public class Event implements Listener {
                 }
             }
 
+            if (event.getView().title().equals(Component.text("텔레포트"))) {
+                event.setCancelled(true);
+                for (ItemStack target : event.getInventory().getContents()) {
+                    if (target != null && clicked_item.equals(target.displayName())) {
+                        if (event.getSlot() == 0) {
+                            for (World w : plugin.getServer().getWorlds()) {
+                                if (w.getEnvironment().equals(World.Environment.NORMAL)) {
+                                    p.getInventory().getItemInMainHand().setAmount(0);
+                                    p.sendMessage(Component.text(ChatColor.DARK_AQUA + "잠시 후 이동됩니다..."));
+                                    p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                                    new BukkitRunnable() {
+                                        public void run() {
+                                            p.teleport(w.getHighestBlockAt(0, 0).getLocation().add(0, 2, 0));
+                                            p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 이동되었습니다."));
+                                            p.playSound(p.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+                                            p.closeInventory();
+                                        }
+                                    }.runTaskLater(plugin, 100);
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            NamespacedKey nkey = new NamespacedKey(CapitalismMinecraft.getPlugins(), "Name");
+                            if (event.getCurrentItem().getItemMeta() == null && !event.getCurrentItem().getItemMeta().getPersistentDataContainer().has(nkey)) return;
+
+                            String name = event.getCurrentItem().getItemMeta().getPersistentDataContainer().get(nkey, PersistentDataType.STRING);
+                            if (name == null) return;
+
+                            Player targetP = plugin.getServer().getPlayer(name);
+                            if (targetP == null) return;
+
+                            p.getInventory().getItemInMainHand().setAmount(0);
+                            p.sendMessage(Component.text(ChatColor.DARK_AQUA + "잠시 후 이동됩니다..."));
+                            p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                            new BukkitRunnable() {
+                                public void run() {
+                                    p.teleport(targetP.getLocation());
+                                    p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 이동되었습니다."));
+                                    p.playSound(p.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+                                    p.closeInventory();
+                                }
+                            }.runTaskLater(plugin, 100);
+                        }
+                        return;
+                    }
+                }
+            }
+
             if (clicked_item == null) return;
             if (event.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
 
@@ -312,12 +355,18 @@ public class Event implements Listener {
                     if (target != null && clicked_item.equals(target.displayName())) {
                         event.setCancelled(true);
 
-                        Player targetP = plugin.getServer().getPlayer(((TextComponent) target.displayName()).content());
-                        if (targetP == null) continue;
+                        NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "Name");
+                        if (event.getCurrentItem().getItemMeta() == null && !event.getCurrentItem().getItemMeta().getPersistentDataContainer().has(key)) return;
+
+                        String name = event.getCurrentItem().getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
+                        if (name == null) return;
+
+                        Player targetP = plugin.getServer().getPlayer(name);
+                        if (targetP == null) return;
 
                         p.sendMessage(Component.text(ChatColor.RED + "보낼 금액의 액수를 채팅창에 입력하세요. (숫자만 입력하세요)"));
 
-                        plugin.wallet.Sending.putIfAbsent(p.getName(), plugin.wallet.new SendInfo(targetP, -1));
+                        plugin.wallet.Sending.put(p.getName(), plugin.wallet.new SendInfo(targetP, -1));
                         p.closeInventory();
                         return;
                     }
@@ -418,19 +467,20 @@ public class Event implements Listener {
             if (plugin.wallet.Sending.get(p.getName()).target != null) {
                 int amount = -1;
 
-                try{
-                    amount = Integer.parseInt(msg);
-                }
-                catch (NumberFormatException ex){
+                if (CapitalismMinecraft.isNumberExeption(msg)) {
                     p.sendMessage(Component.text(ChatColor.RED + "숫자만 입력하세요."));
-                    ex.printStackTrace();
+                    plugin.wallet.Sending.replace(p.getName(), plugin.wallet.new SendInfo(null, -1));
+                    return;
                 }
+
+                amount = Integer.parseInt(msg);
 
                 if (amount != -1) {
                     event.setCancelled(true);
                     plugin.wallet.SendMoneyAtoB(p, plugin.wallet.Sending.get(p.getName()).target, amount);
-                    plugin.wallet.Sending.replace(p.getName(), plugin.wallet.new SendInfo(null, -1));
                 }
+
+                plugin.wallet.Sending.replace(p.getName(), plugin.wallet.new SendInfo(null, -1));
             }
         }
 
@@ -441,13 +491,12 @@ public class Event implements Listener {
 
                 int price = -1;
 
-                try{
-                    price = Integer.parseInt(split[1]);
-                }
-                catch (NumberFormatException ex){
+                if (CapitalismMinecraft.isNumberExeption(split[1])) {
                     p.sendMessage(Component.text(ChatColor.RED + "가격은 숫자로만 입력하세요."));
-                    ex.printStackTrace();
+                    return;
                 }
+
+                price = Integer.parseInt(split[1]);
                 
                 if (price != -1) {
                     plugin.shop.AddESItem(p, p.getInventory().getItemInMainHand(), price);
@@ -670,8 +719,8 @@ public class Event implements Listener {
                 plugin.getServer().sendMessage(Component.text(ChatColor.RED + "[벌금형] " + killer.getName() + "님 에게 " + ChatColor.GOLD + "-3000🪙" + ChatColor.RED + "의 벌금이 주어집니다."));
             }
             else {
-                plugin.wallet.SubMoney(p, 500);
-                p.sendMessage(Component.text(ChatColor.RED + "자연사는 " + ChatColor.GOLD + "-500🪙" + ChatColor.RED + "의 패널티가 주어집니다."));
+                plugin.wallet.SubMoney(p, 300);
+                p.sendMessage(Component.text(ChatColor.RED + "자연사는 " + ChatColor.GOLD + "-300🪙" + ChatColor.RED + "의 패널티가 주어집니다."));
             }
         }
     }
@@ -721,6 +770,15 @@ public class Event implements Listener {
             pl.skill.swordSkill.skill_3(p);
             //괭이 스킬
             pl.skill.hoeSkill.skill_3(p, event);
+
+            if (p.getInventory().getItemInMainHand().getItemMeta() != null) {
+                NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "tp");
+                PersistentDataContainer pdc = p.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
+
+                if (pdc.has(key)) {
+                    pl.shop.contentsStack.OpenTpGUI(p);
+                }
+            }
         }
         else if (event.getAction().isLeftClick()) {
             //활 스킬
