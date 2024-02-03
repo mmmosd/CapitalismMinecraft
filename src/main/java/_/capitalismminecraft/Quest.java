@@ -89,7 +89,7 @@ public class Quest {
             completList.add(p.getUniqueId());
             int num = 0;
             for (ItemStack stack : items) {
-                if (num >= player_item_count) break;
+                if (num >= info.count) break;
 
                 p.getInventory().removeItem(stack);
                 num++;

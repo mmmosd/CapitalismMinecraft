@@ -12,6 +12,7 @@ import _.capitalismminecraft.GUI.EnterOption;
 import _.capitalismminecraft.Items.CustomStack;
 import _.capitalismminecraft.Utils.CheckRegion;
 import _.capitalismminecraft.Utils.CreateRegion;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -59,7 +60,6 @@ import _.capitalismminecraft.Data.RegionData;
 import io.papermc.paper.advancement.AdvancementDisplay;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.md_5.bungee.api.ChatColor;
 
 public class Event implements Listener {

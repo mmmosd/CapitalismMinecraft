@@ -484,6 +484,7 @@ public class Shop {
         if (stack.lore() != null) lores = stack.lore();
 
         lores.add(Component.text(ChatColor.GOLD + "가격 : " + price + "🪙"));
+        lores.add(Component.text("판매자 : " + ChatColor.LIGHT_PURPLE + p.getName()));
         stack.lore(lores);
 
         ExchangeItem.push(new ESItem(stack, price, p.getName()));
@@ -496,15 +497,42 @@ public class Shop {
 
     public void BuyESItem(Player p, int num) {
         ESItem item = ExchangeItem.get(num);
+        Player seller = CapitalismMinecraft.instance.getServer().getPlayer(item.owner);
+
+        if (item.owner.equals(p.getName())) {
+            ItemStack stack = item.item.clone();
+            List<Component> lores = stack.lore();
+            assert lores != null;
+            lores.remove(Component.text(ChatColor.GOLD + "가격 : " + item.price + "🪙"));
+            lores.remove(Component.text("판매자 : " + ChatColor.LIGHT_PURPLE + seller.getName()));
+            stack.lore(lores);
+
+            if (check_can_addItem(p, stack)) {
+                p.getInventory().addItem(stack);
+                p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 취소하였습니다."));
+                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+
+                CapitalismMinecraft.instance.getConfig().set("ES|" + num, null);
+                ExchangeItem.remove(num);
+
+                update_inventory();
+            }
+            else {
+                p.sendMessage(Component.text(ChatColor.RED + "공간이 부족합니다."));
+                p.playSound(p.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1, 1);
+            }
+            return;
+        }
 
         if (CapitalismMinecraft.instance.wallet.Wlist.get(p.getName()) >= item.price) {
             ItemStack stack = item.item.clone();
             List<Component> lores = stack.lore();
+            assert lores != null;
             lores.remove(Component.text(ChatColor.GOLD + "가격 : " + item.price + "🪙"));
+            lores.remove(Component.text("판매자 : " + ChatColor.LIGHT_PURPLE + seller.getName()));
             stack.lore(lores);
 
             if (check_can_addItem(p, stack)) {
-                Player seller = CapitalismMinecraft.instance.getServer().getPlayer(item.owner);
                 CapitalismMinecraft.instance.wallet.SubMoney(p, item.price);
                 CapitalismMinecraft.instance.wallet.AddMoney(seller, item.price);
 
@@ -581,7 +609,7 @@ public class Shop {
 
                 int num = 0;
                 for (ItemStack stack : items) {
-                    if (num >= player_item_count) break;
+                    if (num >= 1) break;
 
                     p.getInventory().removeItem(stack);
                     num++;
