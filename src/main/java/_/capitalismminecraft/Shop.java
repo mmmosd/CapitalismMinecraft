@@ -101,8 +101,8 @@ public class Shop {
 
             while ((fileLine = reader.readLine()) != null) {
                 String[] str = fileLine.split("\\|");
-                int price = Integer.parseInt(str[0]); // txt
-                int num = Integer.parseInt(str[1]); // txt
+                int num = Integer.parseInt(str[0]); // txt
+                int price = Integer.parseInt(str[1]); // txt
                 String owner = str[2]; // txt
                 ItemStack stack =  plugin.getConfig().getItemStack("ES|" + num); // config
 
@@ -491,6 +491,16 @@ public class Shop {
     public void AddESItem(Player p, ItemStack stack, int price) {
         if (ExchangeItem.size() >= 18) {
             p.sendMessage(Component.text(ChatColor.RED + "거래소가 꽉 찼습니다.")); 
+            return;
+        }
+
+        int count = 0;
+        for (ESItem item : ExchangeItem) {
+            if (item.owner.equals(p.getName())) count++;
+        }
+
+        if (count >= 3) {
+            p.sendMessage(Component.text(ChatColor.RED + "거래소에는 항목 3개까지만 등록할 수 있습니다."));
             return;
         }
 

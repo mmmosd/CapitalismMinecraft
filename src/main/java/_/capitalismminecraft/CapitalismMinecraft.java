@@ -122,7 +122,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 Bukkit.getServer().sendMessage(Component.text(ChatColor.YELLOW + "상점 가격이 변동되었습니다!"));
                 Bukkit.getServer().sendMessage(Component.text(ChatColor.GREEN + "퀘스트 목록이 변경되었습니다!"));
             }
-        }, 432000, 432000); //6시간 = 432000tick
+        }, 144000, 144000); //6시간 = 432000tick
     }
     
 

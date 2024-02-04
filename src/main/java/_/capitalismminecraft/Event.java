@@ -329,7 +329,7 @@ public class Event implements Listener {
             if (event.getView().title().equals(Component.text("거래소"))) {
                 if (clicked_item.equals(plugin.menu.button_items.get(10).displayName())) { // 거래소 등록법
                     event.setCancelled(true);
-                    p.sendMessage(Component.text(ChatColor.GREEN + "등록할 아이템을 손에 들고 '등록 (가격)' 또는 'emndfhr (가격)'이라고 채팅창에 입력하세요. (가격은 숫자로만 입력하세요)"));
+                    p.sendMessage(Component.text(ChatColor.GREEN + "등록할 아이템을 손에 들고 '등록 [가격]' 또는 'emdfhr [가격]'이라고 채팅창에 입력하세요. ([가격]은 숫자로만 입력하세요)"));
                     p.closeInventory();
                     return;
                 }
@@ -475,9 +475,12 @@ public class Event implements Listener {
 
                 amount = Integer.parseInt(msg);
 
-                if (amount != -1) {
+                if (amount >= 0) {
                     event.setCancelled(true);
                     plugin.wallet.SendMoneyAtoB(p, plugin.wallet.Sending.get(p.getName()).target, amount);
+                }
+                else {
+                    p.sendMessage(Component.text(ChatColor.RED + "0 이하의 가격은 보낼 수 없습니다."));
                 }
 
                 plugin.wallet.Sending.replace(p.getName(), plugin.wallet.new SendInfo(null, -1));
@@ -498,8 +501,11 @@ public class Event implements Listener {
 
                 price = Integer.parseInt(split[1]);
                 
-                if (price != -1) {
+                if (price >= 0) {
                     plugin.shop.AddESItem(p, p.getInventory().getItemInMainHand(), price);
+                }
+                else {
+                    p.sendMessage(Component.text(ChatColor.RED + "0 이하의 가격은 등록할 수 없습니다."));
                 }
             }
         }
