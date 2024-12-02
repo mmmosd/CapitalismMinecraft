@@ -6,10 +6,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -18,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContentsStack {
-    public ItemStack TpPaper() {
+    public ItemStack TpItem() {
         NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "tp");
-        ItemStack item = new ItemStack(Material.MOJANG_BANNER_PATTERN);
+        ItemStack item = new ItemStack(Material.EYE_ARMOR_TRIM_SMITHING_TEMPLATE);
         ItemMeta im = item.getItemMeta();
         im.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         im.displayName(Component.text(ChatColor.DARK_AQUA + "텔레포트 이용권"));
@@ -68,5 +70,43 @@ public class ContentsStack {
         p.closeInventory();
         p.openInventory(inventory);
         p.playSound(p.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1, 1);
+    }
+
+    public ItemStack EnchantmentItem() {
+        NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "en");
+        ItemStack item = new ItemStack(Material.KNOWLEDGE_BOOK);
+        ItemMeta im = item.getItemMeta();
+        im.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+        im.displayName(Component.text(ChatColor.DARK_AQUA + "인챈트 뽑기"));
+        im.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
+        item.setItemMeta(im);
+
+        return item;
+    }
+
+    public void RandomEnchantment(Player p) {
+        ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
+
+        Enchantment enchantment = Enchantment.values()[(int)(Math.random()*39)];
+        int level = (int)(Math.random()*enchantment.getMaxLevel() + enchantment.getStartLevel());
+
+        EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+        meta.addStoredEnchant(enchantment, level, true);
+        item.setItemMeta(meta);
+        p.getInventory().setItemInMainHand(item);
+        p.getServer().sendMessage(Component.text(ChatColor.LIGHT_PURPLE + p.getName() + ChatColor.YELLOW + "님이 [" + ChatColor.DARK_AQUA + enchantment.getName() + " " + level + ChatColor.YELLOW + "] 획득!"));
+        p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+    }
+
+    public ItemStack InventorySaveItem() {
+        NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "invensave");
+        ItemStack item = new ItemStack(Material.WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE);
+        ItemMeta im = item.getItemMeta();
+        im.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+        im.displayName(Component.text(ChatColor.DARK_AQUA + "인벤토리 세이브"));
+        im.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
+        item.setItemMeta(im);
+
+        return item;
     }
 }

@@ -19,7 +19,7 @@ public class CustomStack {
    public static ItemStack RegionProtecter(int size) {
       ItemStack is = new ItemStack(Material.BRICK);
       ItemMeta im = is.getItemMeta();
-      im.setDisplayName(CapitalismMinecraft.ColorChat("&b&l건차 생성기"));
+      im.setDisplayName(CapitalismMinecraft.ColorChat("&l건설 차단 구역 생성기"));
       List<String> lore = new ArrayList();
       lore.add(CapitalismMinecraft.ColorChat("&7&l사이즈 : &7" + size));
       im.setLore(lore);

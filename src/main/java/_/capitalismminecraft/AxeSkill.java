@@ -78,6 +78,7 @@ public class AxeSkill {
     public void skill_3(Player p, PlayerInteractEvent event) {
         CapitalismMinecraft pl = CapitalismMinecraft.instance;
         ItemStack item = p.getInventory().getItemInMainHand();
+        int stack = 0;
 
         if (check_item(item)) {
             if (pl.skill.check_level(item) >= 3) {
@@ -101,10 +102,13 @@ public class AxeSkill {
                             visited.add(loc);
                             p.getWorld().getBlockAt(loc).breakNaturally(p.getActiveItem(), true);
                             p.setCooldown(item.getType(), 2400);
+                            stack++;
                         }
 
                         while (!q.isEmpty()) {
                             Location now = q.remove();
+
+                            if (stack >= 100) break;
 
                             for (int i = 0; i < 6; i++) {
                                 Location move = new Location(p.getWorld(), now.getBlockX() + Dir[i].x, now.getBlockY() + Dir[i].y, now.getBlockZ() + Dir[i].z);
@@ -124,6 +128,7 @@ public class AxeSkill {
                                     q.add(move);
                                     visited.add(move);
                                     p.getWorld().getBlockAt(move).breakNaturally(p.getActiveItem(), true);
+                                    stack++;
                                 }
                             }
                         }

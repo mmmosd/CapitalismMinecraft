@@ -3,11 +3,12 @@ package _.capitalismminecraft;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -116,20 +117,14 @@ public class Menu {
     }
 
     public void OpenPlayerMenu(Player p) {
-        Inventory inventory = Bukkit.createInventory(p.getInventory().getHolder(), 27, Component.text("메뉴"));
+        Inventory inventory = Bukkit.createInventory(p.getInventory().getHolder(), 9, Component.text("메뉴"));
 
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < 9; i++) {
             inventory.setItem(i, button_items.get(0));
         }
 
-        inventory.setItem(1, button_items.get(2));
-        inventory.setItem(3, button_items.get(3));
-        inventory.setItem(5, button_items.get(4));
-        inventory.setItem(7, button_items.get(5));
-        inventory.setItem(11, button_items.get(6));
-        inventory.setItem(13, button_items.get(7));
-        inventory.setItem(15, button_items.get(8));
-        inventory.setItem(26, button_items.get(9));
+        inventory.setItem(4, button_items.get(9));
+        inventory.setItem(8, button_items.get(10));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -169,5 +164,105 @@ public class Menu {
         p.closeInventory();
         p.openInventory(inventory);
         p.playSound(p.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1, 1);
+    }
+
+    public void MakeArmorStand(Location centerloc, int type) {
+        centerloc = centerloc.toCenterLocation();
+        if (centerloc.getNearbyEntities(centerloc.x(), centerloc.y(), centerloc.z()).size() > 0) {
+            for (Entity e : centerloc.getNearbyEntities(centerloc.x(), centerloc.y(), centerloc.z())) {
+                if (e instanceof ArmorStand) {
+                    ArmorStand armorStand = (ArmorStand)e;
+                    if (armorStand.getPersistentDataContainer().has(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING)) {
+                        String name = armorStand.getPersistentDataContainer().get(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING);
+
+                        if (name == null) break;
+
+                        if (type == 1) {
+                            if (name.equals("wood")) return;
+                        }
+                        else if (type == 2) {
+                            if (name.equals("mineral")) return;
+                        }
+                        else if (type == 3) {
+                            if (name.equals("food")) return;
+                        }
+                        else if (type == 4) {
+                            if (name.equals("content")) return;
+                        }
+                        else if (type == 5) {
+                            if (name.equals("exchange")) return;
+                        }
+                        else if (type == 6) {
+                            if (name.equals("quest")) return;
+                        }
+                        else if (type == 7) {
+                            if (name.equals("skill")) return;
+                        }
+                    }
+                }
+            }
+        }
+
+        ArmorStand armorStand = (ArmorStand)centerloc.getWorld().spawnEntity(centerloc, EntityType.ARMOR_STAND);
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+        armorStand.setVisualFire(false);
+        armorStand.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.ADDING_OR_CHANGING);
+        armorStand.setPersistent(true);
+
+        if (type == 1) {
+            ItemStack is = new ItemStack(Material.OAK_LOG);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "wood");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("원목 상점"));
+            centerloc.getWorld().getBlockAt(centerloc.clone().add(0, 1, 0)).setType(Material.OAK_LOG);
+        }
+        else if (type == 2) {
+            ItemStack is = new ItemStack(Material.DEEPSLATE_DIAMOND_ORE);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "mineral");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("광물 상점"));
+        }
+        else if (type == 3) {
+            ItemStack is = new ItemStack(Material.HAY_BLOCK);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "food");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("농수산물 상점"));
+        }
+        else if (type == 4) {
+            ItemStack is = new ItemStack(Material.BEACON);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "content");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("컨텐츠 상점"));
+        }
+        else if (type == 5) {
+            ItemStack is = new ItemStack(Material.BARREL);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "exchange");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("거래소"));
+        }
+        else if (type == 6) {
+            ItemStack is = new ItemStack(Material.LECTERN);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "quest");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("퀘스트"));
+        }
+        else if (type == 7) {
+            ItemStack is = new ItemStack(Material.ENCHANTING_TABLE);
+            armorStand.setHelmet(is);
+            armorStand.getPersistentDataContainer().set(new NamespacedKey(CapitalismMinecraft.instance, "Menu"), PersistentDataType.STRING, "skill");
+            armorStand.setCustomNameVisible(true);
+            armorStand.customName(Component.text("강화"));
+        }
+
+        centerloc.getWorld().getBlockAt(centerloc.clone().add(0, 1, 0)).setType(Material.END_PORTAL_FRAME);
+        centerloc.getWorld().getBlockAt(centerloc.clone().add(0, 2, 0)).setType(Material.LIGHT);
+        centerloc.getWorld().getBlockAt(centerloc).setType(Material.BEDROCK);
     }
 }

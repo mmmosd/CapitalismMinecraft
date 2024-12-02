@@ -15,6 +15,7 @@ import org.bukkit.advancement.Advancement;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -183,10 +184,15 @@ public class Event implements Listener {
                 event.setCancelled(true);
                 for (ItemStack target : event.getInventory().getContents()) {
                     if (target != null && clicked_item.equals(target.displayName())) {
+                        if (p.getInventory().getItemInMainHand().getAmount() == 0) {
+                            p.sendMessage(Component.text(ChatColor.RED + "텔레포트 이용권이 부족합니다."));
+                            return;
+                        }
+
                         if (event.getSlot() == 0) {
                             for (World w : plugin.getServer().getWorlds()) {
                                 if (w.getEnvironment().equals(World.Environment.NORMAL)) {
-                                    p.getInventory().getItemInMainHand().setAmount(0);
+                                    p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount()-1);
                                     p.sendMessage(Component.text(ChatColor.DARK_AQUA + "잠시 후 이동됩니다..."));
                                     p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
                                     new BukkitRunnable() {
@@ -211,7 +217,7 @@ public class Event implements Listener {
                             Player targetP = plugin.getServer().getPlayer(name);
                             if (targetP == null) return;
 
-                            p.getInventory().getItemInMainHand().setAmount(0);
+                            p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount()-1);
                             p.sendMessage(Component.text(ChatColor.DARK_AQUA + "잠시 후 이동됩니다..."));
                             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
                             new BukkitRunnable() {
@@ -241,44 +247,16 @@ public class Event implements Listener {
                 plugin.menu.OpenPlayerMenu(p);
                 return;
             }
+
+            if (clicked_item.equals(plugin.menu.button_items.get(10).displayName())) { // 거래소 등록법
+                event.setCancelled(true);
+                p.sendMessage(Component.text(ChatColor.GREEN + "등록할 아이템을 손에 들고 '등록 [가격]' 또는 'emdfhr [가격]'이라고 채팅창에 입력하세요. ([가격]은 숫자로만 입력하세요)"));
+                p.closeInventory();
+                return;
+            }
         
             if (event.getView().title().equals(Component.text("메뉴"))) {
-                if (clicked_item.equals(plugin.menu.button_items.get(2).displayName())) { // 목재
-                    event.setCancelled(true);
-                    plugin.shop.OpenWoodShopGUI(p);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(3).displayName())) { // 광물
-                    event.setCancelled(true);
-                    plugin.shop.OpenMineralShopGUI(p);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(4).displayName())) { // 식료품
-                    event.setCancelled(true);
-                    plugin.shop.OpenFoodShopGUI(p);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(5).displayName())) { // 컨텐츠
-                    event.setCancelled(true);
-                    plugin.shop.OpenContentShopGUI(p);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(6).displayName())) { // 거래소
-                    event.setCancelled(true);
-                    plugin.shop.OpenExchangeShopGUI(p);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(7).displayName())) { // 퀘스트
-                    event.setCancelled(true);
-                    plugin.quest.OpenQuestGUI(p);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(8).displayName())) { // 강화
-                    event.setCancelled(true);
-                    plugin.skill.OpenUpgradeGUI(p, new ItemStack(Material.AIR), false);
-                    return;
-                }
-                else if (clicked_item.equals(plugin.menu.button_items.get(9).displayName())) { // 송금
+                if (clicked_item.equals(plugin.menu.button_items.get(9).displayName())) { // 송금
                     event.setCancelled(true);
                     plugin.menu.OpenSendMoneyMenu(p);
                     return;
@@ -327,12 +305,7 @@ public class Event implements Listener {
             }
 
             if (event.getView().title().equals(Component.text("거래소"))) {
-                if (clicked_item.equals(plugin.menu.button_items.get(10).displayName())) { // 거래소 등록법
-                    event.setCancelled(true);
-                    p.sendMessage(Component.text(ChatColor.GREEN + "등록할 아이템을 손에 들고 '등록 [가격]' 또는 'emdfhr [가격]'이라고 채팅창에 입력하세요. ([가격]은 숫자로만 입력하세요)"));
-                    p.closeInventory();
-                    return;
-                }
+
 
                 if (event.getSlot() < plugin.shop.ExchangeItem.size()) {
                     event.setCancelled(true);
@@ -537,6 +510,15 @@ public class Event implements Listener {
                 return;
             }
 
+            int x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
+            x = x<0?-x:x;
+            z = z<0?-z:z;
+
+            if (x < 35 && z < 35) {
+                p.sendMessage(Component.text(ChatColor.RED + "스폰[0, 0] 주변에는 건설 차단 구역을 만들 수 없습니다."));
+                return;
+            }
+
             pdc = im.getPersistentDataContainer();
             key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "CapitalismMinecraft");
             if (pdc.has(key, PersistentDataType.INTEGER)) {
@@ -622,6 +604,7 @@ public class Event implements Listener {
 
     @EventHandler
     public void onActEntity(PlayerInteractAtEntityEvent e) {
+        CapitalismMinecraft pl = CapitalismMinecraft.instance;
         Player p = e.getPlayer();
         if (e.getRightClicked() instanceof ArmorStand) {
             ArmorStand armorStand = (ArmorStand)e.getRightClicked();
@@ -639,6 +622,40 @@ public class Event implements Listener {
                                 eo.openGUI(p, "Option");
                                 CapitalismMinecraft.armorstandData.put(p, armorStand);
                             }
+                        }
+                    }
+                }
+
+                if (armorStand.getPersistentDataContainer().has(new NamespacedKey(pl, "Menu"), PersistentDataType.STRING)) {
+                    e.setCancelled(true);
+
+                    if (!(e.getClickedPosition().getY() < armorStand.getEyeHeight() - 0.358D)) {
+                        String name = armorStand.getPersistentDataContainer().get(new NamespacedKey(pl, "Menu"), PersistentDataType.STRING);
+
+                        if (name == null) return;
+
+                        switch (name) {
+                            case "wood":
+                                pl.shop.OpenWoodShopGUI(p);
+                                break;
+                            case "mineral":
+                                pl.shop.OpenMineralShopGUI(p);
+                                break;
+                            case "food":
+                                pl.shop.OpenFoodShopGUI(p);
+                                break;
+                            case "content":
+                                pl.shop.OpenContentShopGUI(p);
+                                break;
+                            case "exchange":
+                                pl.shop.OpenExchangeShopGUI(p);
+                                break;
+                            case "quest":
+                                pl.quest.OpenQuestGUI(p);
+                                break;
+                            case "skill":
+                                pl.skill.OpenUpgradeGUI(p, new ItemStack(Material.AIR), false);
+                                break;
                         }
                     }
                 }
@@ -667,12 +684,12 @@ public class Event implements Listener {
             plugin.wallet.AddMoney(p, 2500);
         }
         else if (event.getAdvancement().getDisplay().frame().equals(AdvancementDisplay.Frame.GOAL)) { //goal
-            p.sendMessage(Component.text(ChatColor.YELLOW +"목표 달성!" + ChatColor.GOLD + " +500🪙"));
-            plugin.wallet.AddMoney(p, 500);
+            p.sendMessage(Component.text(ChatColor.YELLOW +"목표 달성!" + ChatColor.GOLD + " +1000🪙"));
+            plugin.wallet.AddMoney(p, 1000);
         }
-        else { //normal
-            p.sendMessage(Component.text(ChatColor.WHITE +"발전 과제 달성!" + ChatColor.GOLD + " +100🪙"));
-            plugin.wallet.AddMoney(p, 100);
+        else if (event.getAdvancement().getDisplay().frame().equals(AdvancementDisplay.Frame.TASK)) { //normal
+            p.sendMessage(Component.text(ChatColor.WHITE +"발전 과제 달성!" + ChatColor.GOLD + " +250🪙"));
+            plugin.wallet.AddMoney(p, 250);
         }
     }
 
@@ -682,26 +699,53 @@ public class Event implements Listener {
         Player p = event.getPlayer();
         ItemStack[] items = p.getInventory().getContents();
 
+        NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "invensave");
+
+        if (p.getInventory().getItemInMainHand().hasItemMeta()) {
+            if (p.getInventory().getItemInMainHand().hasItemMeta()) {
+                PersistentDataContainer pdc = p.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
+                if (pdc.has(key)) {
+                    p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount()-1);
+                    return;
+                }
+            }
+        }
+        else if (p.getInventory().getItemInOffHand().hasItemMeta()) {
+            if (p.getInventory().getItemInOffHand().hasItemMeta()) {
+                PersistentDataContainer pdc = p.getInventory().getItemInOffHand().getItemMeta().getPersistentDataContainer();
+                if (pdc.has(key)) {
+                    p.getInventory().getItemInOffHand().setAmount(p.getInventory().getItemInOffHand().getAmount()-1);
+                    return;
+                }
+            }
+        }
+
         p.getInventory().clear();
         p.setLevel(0);
         p.setExp(0);
 
-        Block left = p.getWorld().getBlockAt(p.getLocation());
-        left.setType(Material.CHEST);
-        Block right = p.getWorld().getBlockAt(p.getLocation().getBlockX()+1, p.getLocation().getBlockY(), p.getLocation().getBlockZ());
-        right.setType(Material.CHEST);
+        Block down = p.getWorld().getBlockAt(p.getLocation());
+        down.setType(Material.CHEST);
+        Block up = p.getWorld().getBlockAt(p.getLocation().getBlockX(), p.getLocation().getBlockY()+1, p.getLocation().getBlockZ());
 
-        Chest Lchest = (Chest) left.getState(), Rchest = (Chest) right.getState();
-        Inventory Linv = Lchest.getBlockInventory(), Rinv = Rchest.getBlockInventory();
+        if (up.getType().equals(Material.BEDROCK)) {
+            up = p.getWorld().getBlockAt(p.getLocation().getBlockX(), p.getLocation().getBlockY()-1, p.getLocation().getBlockZ());
+        }
+        up.setType(Material.CHEST);
 
-        Linv.clear();
-        Rinv.clear();
+        Chest Achest = (Chest) down.getState(), Bchest = (Chest) up.getState();
+        Inventory Ainv = Achest.getBlockInventory(), Binv = Bchest.getBlockInventory();
+
+        Ainv.clear();
+        Binv.clear();
 
         for (int i = 0; i < items.length; i++) {
+            if (items[i] == null) continue;
+
             if (i < 27)
-                Linv.setItem(i, items[i]);
+                Ainv.setItem(i, items[i]);
             else
-                Rinv.setItem(i-27, items[i]);
+                Binv.setItem(i-27, items[i]);
         }
 
         new BukkitRunnable() {
@@ -721,12 +765,12 @@ public class Event implements Listener {
             if (event.getEntity().getKiller() != null && event.getEntity().getKiller() instanceof Player) {
                 Player killer = event.getEntity().getKiller();
 
-                plugin.wallet.SubMoney(killer, 3000);
-                plugin.getServer().sendMessage(Component.text(ChatColor.RED + "[벌금형] " + killer.getName() + "님 에게 " + ChatColor.GOLD + "-3000🪙" + ChatColor.RED + "의 벌금이 주어집니다."));
+                plugin.wallet.SubMoney(killer, 2500);
+                plugin.getServer().sendMessage(Component.text(ChatColor.RED + "[벌금형] " + killer.getName() + "님 에게 " + ChatColor.GOLD + "-2500🪙" + ChatColor.RED + "의 벌금이 주어집니다."));
             }
             else {
-                plugin.wallet.SubMoney(p, 300);
-                p.sendMessage(Component.text(ChatColor.RED + "자연사는 " + ChatColor.GOLD + "-300🪙" + ChatColor.RED + "의 패널티가 주어집니다."));
+                plugin.wallet.SubMoney(p, 500);
+                p.sendMessage(Component.text(ChatColor.RED + "자연사는 " + ChatColor.GOLD + "-500🪙" + ChatColor.RED + "의 패널티가 주어집니다."));
             }
         }
     }
@@ -778,11 +822,26 @@ public class Event implements Listener {
             pl.skill.hoeSkill.skill_3(p, event);
 
             if (p.getInventory().getItemInMainHand().getItemMeta() != null) {
-                NamespacedKey key = new NamespacedKey(CapitalismMinecraft.getPlugins(), "tp");
+                NamespacedKey tpkey = new NamespacedKey(CapitalismMinecraft.getPlugins(), "tp");
                 PersistentDataContainer pdc = p.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
 
-                if (pdc.has(key)) {
+                if (pdc.has(tpkey)) {
                     pl.shop.contentsStack.OpenTpGUI(p);
+                }
+
+                NamespacedKey enkey = new NamespacedKey(CapitalismMinecraft.getPlugins(), "en");
+
+                if (pdc.has(enkey)) {
+                    pl.shop.contentsStack.RandomEnchantment(p);
+                }
+            }
+
+            if (event.getClickedBlock() != null) {
+                Location loc = event.getClickedBlock().getLocation();
+                CheckRegion cr = new CheckRegion(loc);
+                if (!p.isOp() && cr.isBlockIsOtherRegionInIfOwner(p)) {
+                    event.setCancelled(true);
+                    p.sendMessage(CapitalismMinecraft.ColorChat(CapitalismMinecraft.bb + "&f해당 위치는 건차 지역 범위 내 입니다."));
                 }
             }
         }
@@ -922,6 +981,19 @@ public class Event implements Listener {
 
         //괭이 스킬
         pl.skill.hoeSkill.skill_4(p);
+
+        if (p.getWorld().getEnvironment().equals(World.Environment.NORMAL)) {
+            int x = p.getLocation().getBlockX(), z = p.getLocation().getBlockZ();
+            x = x<0?-x:x;
+            z = z<0?-z:z;
+
+            if (x < 20 && z < 20) {
+                if (!p.isOp()) p.setGameMode(GameMode.ADVENTURE);
+            }
+            else {
+                if (!p.isOp()) p.setGameMode(GameMode.SURVIVAL);
+            }
+        }
     }
 
     @EventHandler
@@ -946,6 +1018,12 @@ public class Event implements Listener {
         //곡괭이 스킬
         pl.skill.pickaxeSkill.skill_1(p);
         pl.skill.pickaxeSkill.skill_2(p);
+
+        for (Location t : pl.skill.pickaxeSkill.glasses) {
+            if (loc.equals(t)) {
+                e.setDropItems(false);
+            }
+        }
 
         //도끼 스킬
         pl.skill.axeSkill.skill_1(p);

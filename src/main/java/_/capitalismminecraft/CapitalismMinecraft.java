@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +123,7 @@ public final class CapitalismMinecraft extends JavaPlugin {
                 Bukkit.getServer().sendMessage(Component.text(ChatColor.YELLOW + "상점 가격이 변동되었습니다!"));
                 Bukkit.getServer().sendMessage(Component.text(ChatColor.GREEN + "퀘스트 목록이 변경되었습니다!"));
             }
-        }, 144000, 144000); //6시간 = 432000tick
+        }, 288000, 288000); //6시간 = 432000tick
     }
     
 
@@ -172,6 +173,18 @@ public final class CapitalismMinecraft extends JavaPlugin {
             w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
             w.setGameRule(GameRule.MOB_GRIEFING, false);
             w.setSpawnLocation(0, 0, 0);
+
+            if (w.getEnvironment().equals(World.Environment.NORMAL) || w.getEnvironment().equals(World.Environment.CUSTOM)) {
+                Location loc = w.getHighestBlockAt(0, 0).getLocation().add(0, -1, 0);
+
+                menu.MakeArmorStand(loc.add(-6, 0, 7), 1);
+                menu.MakeArmorStand(loc.add(4, 0, 2), 2);
+                menu.MakeArmorStand(loc.add(4, 0, 0), 3);
+                menu.MakeArmorStand(loc.add(4, 0, -2), 4);
+                menu.MakeArmorStand(loc.add(-10, 0, -4), 5);
+                menu.MakeArmorStand(loc.add(4, 0, 2), 6);
+                menu.MakeArmorStand(loc.add(4, 0, -2), 7);
+            }
         }
     }
 

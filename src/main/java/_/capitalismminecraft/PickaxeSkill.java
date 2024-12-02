@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -57,6 +58,8 @@ public class PickaxeSkill {
         }
     }
 
+    public List<Location> glasses = new ArrayList<Location>();
+
     public void skill_3(Player p) { // click
         CapitalismMinecraft pl = CapitalismMinecraft.instance;
         ItemStack item = p.getInventory().getItemInMainHand();
@@ -80,6 +83,7 @@ public class PickaxeSkill {
                                 || p.getWorld().getBlockAt(i, j, k).getType().equals(Material.ANDESITE)
                                 || p.getWorld().getBlockAt(i, j, k).getType().equals(Material.NETHERRACK)) {
                                     blocks.put(new Location(p.getWorld(), i, j, k), p.getWorld().getBlockAt(i, j, k).getType());
+                                    glasses.add(new Location(p.getWorld(), i, j, k));
                                     p.getWorld().getBlockAt(i, j, k).setType(Material.LIGHT_GRAY_STAINED_GLASS);
                                 }
                             }
@@ -87,15 +91,24 @@ public class PickaxeSkill {
                     }
 
                     p.playSound(p.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 1, 1);
-                    p.setCooldown(item.getType(), 200);
+                    p.setCooldown(item.getType(), 1200);
 
                     new BukkitRunnable() {
                         public void run() {
-                            for (Entry<Location, Material> info : blocks.entrySet()) {
-                                info.getKey().getWorld().getBlockAt(info.getKey()).setType(info.getValue());
+                            for (int i = x - 2; i <= x + 2; i++) {
+                                for (int j = y - 2; j <= y + 2; j++) {
+                                    for (int k = z - 2; k <= z + 2; k++) {
+                                        if (p.getWorld().getBlockAt(i, j, k).getType().equals(Material.LIGHT_GRAY_STAINED_GLASS)) {
+                                            if (blocks.containsKey(new Location(p.getWorld(), i, j, k))) {
+                                                glasses.remove(new Location(p.getWorld(), i, j, k));
+                                                p.getWorld().getBlockAt(i, j, k).setType(blocks.get(new Location(p.getWorld(), i, j, k)));
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }.runTaskLater(pl, 20);
+                    }.runTaskLater(pl, 100);
                 }
             }
         }

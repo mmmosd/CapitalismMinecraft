@@ -33,8 +33,13 @@ public class Wallet {
             public void run() {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     plugin.getConfig().set(p.getName(), Wlist.get(p.getName()));
-                    plugin.saveConfig();
                 }
+
+                for (OfflinePlayer p : plugin.getServer().getOfflinePlayers()) {
+                    if (p.getName() != null && Wlist.containsKey(p.getName()))
+                        plugin.getConfig().set(p.getName(), Wlist.get(p.getName()));
+                }
+                plugin.saveConfig();
             }
         }, 20 * 30, 20 * 30);
     }
@@ -57,14 +62,21 @@ public class Wallet {
     }
 
     public void CreateWallet(Player p) {
-        Wlist.putIfAbsent(p.getName(), -1000);
+        Wlist.putIfAbsent(p.getName(), -3000);
     }
 
     public void AddMoney(Player p, int amount) {
         Wlist.replace(p.getName(), Wlist.get(p.getName()) + amount);
     }
+    public void AddMoney(OfflinePlayer p, int amount) {
+        if (p.getName() != null && Wlist.containsKey(p.getName()))
+            Wlist.replace(p.getName(), Wlist.get(p.getName()) + amount);
+    }
 
     public void SubMoney(Player p, int amount) {
+        Wlist.replace(p.getName(), Wlist.get(p.getName()) - amount);
+    }
+    public void SubMoney(OfflinePlayer p, int amount) {
         Wlist.replace(p.getName(), Wlist.get(p.getName()) - amount);
     }
 

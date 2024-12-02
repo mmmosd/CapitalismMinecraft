@@ -46,7 +46,7 @@ public class Quest {
         inventory.setItem(13, quests.get(1).item);
         inventory.setItem(15, quests.get(2).item);
 
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);

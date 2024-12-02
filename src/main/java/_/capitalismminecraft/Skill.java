@@ -131,7 +131,7 @@ public class Skill {
         inventory.setItem(22, stack);
         inventory.setItem(13, upgrade_stack);
 
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);

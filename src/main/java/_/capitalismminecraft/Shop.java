@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import _.capitalismminecraft.Items.CustomStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -43,13 +44,13 @@ public class Shop {
 
     public class PriceInfo {
         int min_price, max_price, now_price;
-        int before_count, now_count;
+        int avg_count, now_count;
 
-        public PriceInfo(int min_price, int max_price, int now_price, int before_count, int now_count) {
+        public PriceInfo(int min_price, int max_price, int now_price, int avg_count, int now_count) {
             this.min_price = min_price;
             this.max_price = max_price;
             this.now_price = now_price;
-            this.before_count = before_count;
+            this.avg_count = avg_count;
             this.now_count = now_count;
         }
 
@@ -60,6 +61,7 @@ public class Shop {
 
     List<ItemStack> button_items = new ArrayList<ItemStack>();
     HashMap<Material, PriceInfo> shop_items = new HashMap<Material, PriceInfo>();
+    int rotation = 1;
 
     ContentsStack contentsStack = new ContentsStack();
     HashMap<Material, Integer> ContentItem = new HashMap<Material, Integer>();
@@ -126,7 +128,7 @@ public class Shop {
                     FileWriter writer = new FileWriter(f, false);
 
                     for (Entry<Material, PriceInfo> set : shop_items.entrySet()) {
-                        writer.write(set.getKey().name() + "|" + set.getValue().now_price + "|" + set.getValue().before_count + "|" + set.getValue().now_count + "\n"); // seller_price (txt)
+                        writer.write(set.getKey().name() + "|" + set.getValue().now_price + "|" + set.getValue().avg_count + "|" + set.getValue().now_count + "\n"); // seller_price (txt)
                     }
 
                     writer.close();
@@ -246,11 +248,11 @@ public class Shop {
         button_items.add(item);
 
         //음식 20~36
-        shop_items.put(Material.BREAD, new PriceInfo(1, 4, 2, 0, 0));
+        shop_items.put(Material.BREAD, new PriceInfo(6, 12, 9, 0, 0));
         item = new ItemStack(Material.BREAD);
         button_items.add(item);
 
-        shop_items.put(Material.APPLE, new PriceInfo(1, 4, 2, 0, 0));
+        shop_items.put(Material.APPLE, new PriceInfo(2, 6, 4, 0, 0));
         item = new ItemStack(Material.APPLE);
         button_items.add(item);
 
@@ -262,7 +264,7 @@ public class Shop {
         item = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE);
         button_items.add(item);
 
-        shop_items.put(Material.BAKED_POTATO, new PriceInfo(1, 6, 3, 0, 0));
+        shop_items.put(Material.BAKED_POTATO, new PriceInfo(1, 4, 2, 0, 0));
         item = new ItemStack(Material.BAKED_POTATO);
         button_items.add(item);
 
@@ -315,7 +317,9 @@ public class Shop {
         button_items.add(item);
 
         ContentItem.put(CustomStack.RegionProtecter(1).getType(), 5000);
-        ContentItem.put(contentsStack.TpPaper().getType(), 2500);
+        ContentItem.put(contentsStack.EnchantmentItem().getType(), 7000);
+        ContentItem.put(contentsStack.TpItem().getType(), 2500);
+        ContentItem.put(contentsStack.InventorySaveItem().getType(), 5000);
     }
 
     public void update_inventory() {
@@ -360,7 +364,7 @@ public class Shop {
             inventory.setItem(i, item);
         }
 
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -391,7 +395,7 @@ public class Shop {
             inventory.setItem(num++, item);
         }
 
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -430,7 +434,7 @@ public class Shop {
             inventory.setItem(num++, item);
         }
 
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -446,6 +450,7 @@ public class Shop {
         }
 
         int num = 0;
+
         ItemStack item = CustomStack.RegionProtecter(1);
         List<Component> lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + ContentItem.get(item.getType()) + "🪙"));
@@ -454,7 +459,7 @@ public class Shop {
         item.lore(lores);
         inventory.setItem(num++, item);
 
-        item = contentsStack.TpPaper();
+        item = contentsStack.EnchantmentItem();
         lores = new ArrayList<>();
         lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + ContentItem.get(item.getType()) + "🪙"));
         lores.add(Component.text(ChatColor.GRAY + "[좌클릭] 아이템 1개 구매"));
@@ -462,7 +467,23 @@ public class Shop {
         item.lore(lores);
         inventory.setItem(num++, item);
 
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+        item = contentsStack.TpItem();
+        lores = new ArrayList<>();
+        lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + ContentItem.get(item.getType()) + "🪙"));
+        lores.add(Component.text(ChatColor.GRAY + "[좌클릭] 아이템 1개 구매"));
+        lores.add(Component.text(ChatColor.RED + "판매가 불가능한 상품입니다."));
+        item.lore(lores);
+        inventory.setItem(num++, item);
+
+        item = contentsStack.InventorySaveItem();
+        lores = new ArrayList<>();
+        lores.add(Component.text(ChatColor.RED + "구매" + ChatColor.GOLD + " 가격 : " + ContentItem.get(item.getType()) + "🪙"));
+        lores.add(Component.text(ChatColor.GRAY + "[좌클릭] 아이템 1개 구매"));
+        lores.add(Component.text(ChatColor.RED + "판매가 불가능한 상품입니다."));
+        item.lore(lores);
+        inventory.setItem(num++, item);
+
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -470,9 +491,9 @@ public class Shop {
     }
 
     public void OpenExchangeShopGUI(Player p) {
-        Inventory inventory = Bukkit.createInventory(p.getInventory().getHolder(), 27, Component.text("거래소"));
+        Inventory inventory = Bukkit.createInventory(p.getInventory().getHolder(), 54, Component.text("거래소"));
 
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < 54; i++) {
             inventory.setItem(i, CapitalismMinecraft.instance.menu.button_items.get(0));
         }
 
@@ -480,8 +501,8 @@ public class Shop {
             inventory.setItem(i, ExchangeItem.get(i).item);
         }
 
-        inventory.setItem(18, CapitalismMinecraft.instance.menu.button_items.get(10));
-        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
+        inventory.setItem(45, CapitalismMinecraft.instance.menu.button_items.get(10));
+//        inventory.setItem(26, CapitalismMinecraft.instance.menu.button_items.get(1));
 
         p.closeInventory();
         p.openInventory(inventory);
@@ -489,7 +510,7 @@ public class Shop {
     }
 
     public void AddESItem(Player p, ItemStack stack, int price) {
-        if (ExchangeItem.size() >= 18) {
+        if (ExchangeItem.size() >= 54 - 9) {
             p.sendMessage(Component.text(ChatColor.RED + "거래소가 꽉 찼습니다.")); 
             return;
         }
@@ -508,8 +529,8 @@ public class Shop {
 
         if (stack.lore() != null) lores = stack.lore();
 
-        lores.add(0, Component.text(ChatColor.GRAY + "[판매자] " + ChatColor.LIGHT_PURPLE + p.getName()));
-        lores.add(0, Component.text(ChatColor.GOLD + "가격 : " + price + "🪙"));
+        lores.add(Component.text(ChatColor.GRAY + "[판매자] " + ChatColor.LIGHT_PURPLE + p.getName()));
+        lores.add(Component.text(ChatColor.GOLD + "가격 : " + price + "🪙"));
         stack.lore(lores);
 
         ExchangeItem.push(new ESItem(stack, price, p.getName()));
@@ -526,11 +547,15 @@ public class Shop {
 
         if (item.owner.equals(p.getName())) {
             ItemStack stack = item.item.clone();
-            List<Component> lores = stack.lore();
-            assert lores != null;
-            lores.remove(0);
-            lores.remove(0);
-            stack.lore(lores);
+            if (stack.lore().size() <= 2) {
+                stack.lore(null);
+            }
+            else {
+                List<Component> lores = stack.lore();
+                lores.remove(lores.size()-1);
+                lores.remove(lores.size()-1);
+                stack.lore(lores);
+            }
 
             if (check_can_addItem(p, stack)) {
                 p.getInventory().addItem(stack);
@@ -551,26 +576,47 @@ public class Shop {
 
         if (CapitalismMinecraft.instance.wallet.Wlist.get(p.getName()) >= item.price) {
             ItemStack stack = item.item.clone();
-            List<Component> lores = stack.lore();
-            assert lores != null;
-            lores.remove(lores.size()-1);
-            lores.remove(lores.size()-1);
-            stack.lore(lores);
+            if (stack.lore().size() <= 2) {
+                stack.lore(null);
+            }
+            else {
+                List<Component> lores = stack.lore();
+                lores.remove(lores.size()-1);
+                lores.remove(lores.size()-1);
+                stack.lore(lores);
+            }
 
             if (check_can_addItem(p, stack)) {
-                CapitalismMinecraft.instance.wallet.SubMoney(p, item.price);
-                CapitalismMinecraft.instance.wallet.AddMoney(seller, item.price);
+                if (seller != null) {
+                    CapitalismMinecraft.instance.wallet.SubMoney(p, item.price);
+                    CapitalismMinecraft.instance.wallet.AddMoney(seller, item.price);
 
-                p.getInventory().addItem(stack);
-                p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 구매하였습니다."));
-                seller.sendMessage(Component.text(ChatColor.LIGHT_PURPLE + p.getName() + ChatColor.GREEN +"님이 당신의 아이템을 구매하였습니다!" + ChatColor.GOLD + " +" + item.price + "🪙"));
-                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                seller.playSound(seller.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    p.getInventory().addItem(stack);
+                    p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 구매하였습니다."));
+                    seller.sendMessage(Component.text(ChatColor.LIGHT_PURPLE + p.getName() + ChatColor.GREEN +"님이 당신의 아이템을 구매하였습니다!" + ChatColor.GOLD + " +" + item.price + "🪙"));
+                    p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    seller.playSound(seller.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
 
-                CapitalismMinecraft.instance.getConfig().set("ES|" + num, null);
-                ExchangeItem.remove(num);
+                    CapitalismMinecraft.instance.getConfig().set("ES|" + num, null);
+                    ExchangeItem.remove(num);
 
-                update_inventory();
+                    update_inventory();
+                }
+                else {
+                    OfflinePlayer off_seller = CapitalismMinecraft.instance.getServer().getOfflinePlayer(item.owner);
+
+                    CapitalismMinecraft.instance.wallet.SubMoney(p, item.price);
+                    CapitalismMinecraft.instance.wallet.AddMoney(off_seller, item.price);
+
+                    p.getInventory().addItem(stack);
+                    p.sendMessage(Component.text(ChatColor.GREEN + "성공적으로 구매하였습니다."));
+                    p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+
+                    CapitalismMinecraft.instance.getConfig().set("ES|" + num, null);
+                    ExchangeItem.remove(num);
+
+                    update_inventory();
+                }
             }
             else {
                 p.sendMessage(Component.text(ChatColor.RED + "공간이 부족합니다."));
@@ -588,8 +634,23 @@ public class Shop {
 
         if (CapitalismMinecraft.instance.wallet.Wlist.get(p.getName()) >= price) {
             ItemStack stack = category.clone();
-            stack.lore(new ArrayList<>());
-                
+            List<Component> lores = new ArrayList<>();
+
+            if (category.getType().equals(CustomStack.RegionProtecter(1).getType())) {
+                lores.add(Component.text(ChatColor.GRAY + "[우클릭] 아이템 사용"));
+            }
+            else if (category.getType().equals(contentsStack.EnchantmentItem().getType())) {
+                lores.add(Component.text(ChatColor.GRAY + "[우클릭] 아이템 사용"));
+            }
+            else if (category.getType().equals(contentsStack.TpItem().getType())) {
+                lores.add(Component.text(ChatColor.GRAY + "[우클릭] 아이템 사용"));
+            }
+            else if (category.getType().equals(contentsStack.InventorySaveItem().getType())) {
+                lores.add(Component.text(ChatColor.GRAY + "죽을 때, 손에 아이템을 들고있다면 사용됨"));
+            }
+
+            stack.lore(lores);
+
             if (check_can_addItem(p, stack)) {
                 CapitalismMinecraft.instance.wallet.SubMoney(p, price);
             
@@ -759,6 +820,8 @@ public class Shop {
             Set_item_price(stack.getType());
         }
 
+        rotation++;
+
         update_inventory();
     }
 
@@ -766,23 +829,17 @@ public class Shop {
         PriceInfo info = shop_items.get(material);
         int result_price = 0;
 
-        if (info.before_count > 0 && info.now_count > 0) { // 이전 데이터가 있어야 가격 변화
-            result_price = (int) ((info.now_price * info.now_count)/info.before_count);
+        if (info.now_count > info.avg_count) { // 이전 판매량들의 평균보다 현재 판매량이 높다면 랜덤으로 가격 하락
+            result_price = info.now_price - (int)(Math.random()*(info.now_price - info.min_price));
         }
-        if (info.before_count <= 0 && info.now_count > 0) { // 이전 판매량이 없고 현재 판매량이 있을 때는 랜덤으로 가격 하락
-            result_price = info.now_price - (int)(Math.random()*(info.max_price - info.min_price));
-        }
-        if (info.before_count > 0 && info.now_count <= 0) { // 이전 판매량이 없고 현재 판매량이 있을 때는 랜덤으로 가격 하락
-            result_price = info.now_price - (int)(Math.random()*(info.max_price - info.min_price));
-        }
-        if (info.before_count <= 0 && info.now_count <= 0) { // 판매량이 아예 없을 때는 랜덤으로
-            result_price = (int)(Math.random()*(info.max_price - info.min_price)) + info.now_price;
+        else { // 아니라면 가격 상승
+            result_price = info.now_price + (int)(Math.random()*(info.max_price - info.now_price));
         }
 
         if (result_price <= info.min_price) result_price = info.min_price;
         if (result_price >= info.max_price) result_price = info.max_price;
 
-        shop_items.get(material).before_count = info.now_count;
+        shop_items.get(material).avg_count = (shop_items.get(material).avg_count+info.now_count)/rotation;
         shop_items.get(material).now_count = 0;
         shop_items.get(material).now_price = result_price;
     }
